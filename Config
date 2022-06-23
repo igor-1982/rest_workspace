@@ -2,11 +2,23 @@
 #remote should be "ID@HOST:
 remote=$1
 
-export fdqc_repo_path="/share/repo/REST/fdqc.mirror"
-git clone $remote$fdqc_repo_path fdqc
-export fdqc_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
-git clone $remote$fdqc_tensor_repo_path fdqc-tensors
-export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
-git clone $remote$rust_libcint_repo_path rust\-libcint 
-export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
-git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
+#export fdqc_repo_path="/share/repo/REST/fdqc.mirror"
+#git clone $remote$fdqc_repo_path fdqc
+#export fdqc_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
+#git clone $remote$fdqc_tensor_repo_path fdqc-tensors
+#export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
+#git clone $remote$rust_libcint_repo_path rust\-libcint 
+#export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
+#git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
+
+# Some libraries is prerequested for REST:
+#       1) the external libcint for 2-, 3-, and 4-center GTO integrals.
+#       2) the external libopenblas for blas and lapack operations.
+#
+#1): libcint_path: the path to libcint.so
+libcint_path='/share/apps/lib/libcint/build'
+#
+#2): libopenblas_path: the path to libopenblas.so
+libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
+
+echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
