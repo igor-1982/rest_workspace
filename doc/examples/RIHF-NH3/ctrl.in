@@ -8,9 +8,9 @@
      "auxbas_type":               "spheric",
      "guessfile":                 "init_guess.chk.0",
      "chkfile":                   "none",
-     "charge":                    1.0,
-     "spin":                      2.0,
-     "spin_polarization":         true,
+     "charge":                    0.0,
+     "spin":                      1.0,
+     "spin_polarization":         false,
      "mixer":                     "diis",
      "num_max_diis":              8,
      "start_diis_cycle":          1,
@@ -19,7 +19,7 @@
      "scf_acc_rho":               1.0e-5,
      "scf_acc_eev":               1.0e-4,
      "scf_acc_etot":              1.0e-8,
-     "num_threads":               24
+     "num_threads":               6
  },
  "geom" : {
      "name": "NH3, example",
