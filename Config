@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+export fdqc_repo_path="/share/repo/REST/fdqc.mirror"
+git clone $fdqc_repo_path fdqc
+export fdqc_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
+git clone $fdqc_tensor_repo_path fdqc-tensors
+export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
+git clone $rust_libcint_repo_path rust\-libcint 
+export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
+git clone $parse_json_basis_set_repo_path parse_json_basis_set
