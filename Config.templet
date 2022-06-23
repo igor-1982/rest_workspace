@@ -23,5 +23,4 @@ libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
 
 echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path'"' >> $HOME/.bash_profile
-source $HOME/.bash_profile
 
