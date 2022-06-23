@@ -11,7 +11,7 @@ git clone $remote$rust_libcint_repo_path rust\-libcint
 export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
 git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
 
-# Some libraries is prerequested for REST, which should be installed and reachable before REST installation
+# Some prerequisite libraries for REST, which should be installed and accessable for REST
 #       1) the external libcint for 2-, 3-, and 4-center GTO integrals.
 #       2) the external libopenblas for blas and lapack operations.
 #
