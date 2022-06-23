@@ -1,0 +1,295 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[hmargin=1.6cm,vmargin=1.6cm]{geometry}
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+\usepackage{multirow} % for multirow
+%\usepackage{forest}
+%\usepackage{tikz-qtree,tikz-qtree-compat}
+%% The amsthm package provides extended theorem environments. For example \begin{split}
+\usepackage{amsthm,amsmath,amsfonts}
+
+% set link for ebook
+%\usepackage[dvipdfmx,bookmarks=true,bookmarksnumbered=false,
+%            colorlinks,linkcolor=black,
+%            citecolor=black,urlcolor=black]{hyperref}
+\usepackage[bookmarks=true,bookmarksnumbered=false,
+            colorlinks,linkcolor=black,
+            citecolor=black,urlcolor=black]{hyperref}
+
+%\usepackage{tikz}
+
+%\nofiles
+%opening
+\title{Rust-based Electronic-structure Simulation Toolkit (REST)}
+\author{REST development team}
+
+\begin{document}
+
+\maketitle
+
+
+
+%\tableofcontents
+
+\newpage
+Refering to Szabo's book for Restricted and Unrestricted Hartree-Fock formulas 
+%Close-shell expression refers to Szabo's book, Equations of 3.124-125, on Pages 140-142; 
+%while open-shell expression refers to Pages 210-214
+\begin{equation}
+	\boldsymbol{F}\boldsymbol{C}=\boldsymbol{S}\boldsymbol{C}\varepsilon
+\end{equation}
+\textbf{WARNNING:}
+\begin{equation}
+	\sum_{j}F_{ij}^{\alpha}C_{jk}^{\alpha} = \varepsilon_k\sum_{j}S_{ij}C_{jk}^{\alpha}
+\end{equation}
+With the notation definition of four center integral $\left( ij|kl \right)$ of
+\begin{equation}
+	\left( ij|kl \right) = \int d\textbf{r}_1d\textbf{r}_2 \phi_{i}^{*}(1)\phi_{j}(1)r_{12}^{-1}\phi_{k}^{*}(2)\phi_{l}(2),
+\end{equation}
+the close-shell expression of Fock matrix (Similar to Equations 3.148 and 3.154 on Pages 140 and 141) is 
+\begin{equation}
+	\begin{split}
+	F_{ij}=&H_{ij}^{core}+\sum_{kl}D_{lk}\left[\left( ij|kl \right)-\frac{1}{2}\left(il|kj  \right)\right] \\
+	=&\left.H_{ij}^{core}+\sum_{kl}D_{kl}\left[\left( ij|kl \right)-\frac{1}{2}\left(ik|jl  \right)\right]\right|_{\textbf{D} \in \mathbb{R}} \\
+    \end{split}
+\end{equation}
+The density matrix in the close shell is defined by (Equation 3.145 on Page 139)
+\begin{equation}
+	\begin{split}
+		D_{kl}=&2\sum_{a}^{N/2}C_{ka}C_{la}^{*}\\
+		=&\left.2\sum_{a}^{N/2}C_{ka}C_{la}=D_{lk}\right|_{\textbf{D}\in \mathbb{R}}\\
+    %\textbf{D} = &2\textbf{C}\cdot \textbf{C}^{H}=2\textbf{C}\cdot \textbf{C}^{T}\\
+    \end{split}
+\end{equation}
+
+The unrestricted expression of Fock matrix (Similar to Equations 3.348 and 3.349 on Page 214) is defined by 
+\begin{equation}
+	\begin{split}
+	    F_{ij}^{\sigma}=&H_{ij}^{core}+\sum_{kl}\left[D_{lk}^{\textit{Tot}}\left( ij|kl \right)-D_{kl}^{\sigma}\left(il|kj  \right)\right] \\
+		=&H_{ij}^{core}+\left.\sum_{kl}\left[D_{kl}^{\textit{Tot}}\left( ij|kl \right)
+		    -D_{kl}^{\sigma}\left(ik|jl  \right)\right]\right|_{\textbf{D} \in \mathbb{R}} \\
+	\end{split}
+\end{equation}
+The density matrix in the general cases (Similar to Equations 3.342-343 on Pages 213) is defined by 
+\begin{equation}
+	\begin{split}
+		D_{kl}^{\sigma}=&\sum_{a}^{all}W_{a}^{\sigma}C_{ka}^{\sigma}C_{la}^{\sigma*}=\sum_{a}^{N_w}W_{a}^{\sigma}C_{ka}^{\sigma}C_{la}^{\sigma*}
+		=\left.\sum_{a}^{N_w}W_{a}^{\sigma}C_{ka}^{\sigma}C_{la}^{\sigma}\right|_{\textbf{C}\in\mathbb{R}}\\
+		\textbf{D}^{\sigma} = &\textbf{wC}^{\sigma}\cdot \textbf{C}^{\sigma H}=\textbf{wC}^{\sigma}\cdot \textbf{C}^{\sigma T}\\
+		\textbf{D}^{\textit{Tot}} = &\sum_{\sigma}\textbf{D}^{\sigma}=\textbf{D}^{\alpha}+\textbf{D}^{\beta}\\
+    \end{split}
+\end{equation}
+Here, $W_{a}^{\sigma}$ is the electron occupation number of the $a$th orbital in the $\sigma$-spin channel.
+$N_w$ is the number of orbitals that have non-zero electronic occupation.
+
+For the coulomb term, the RI expression is:
+\begin{equation}
+	\begin{split}
+		J_{ij}^{\sigma} = &\sum_{kl}D_{kl}^{\sigma}\left( ij|kl \right)\\
+		= &\sum_{kl}\sum_{\mu}D_{kl}^{\sigma}M_{ij}^{\mu}M_{kl}^{\mu}\\
+		= &\sum_{\mu}M_{ij}^{\mu}\left(\sum_{kl}D_{kl}^{\sigma}M_{kl}^{\mu}  \right)\\
+	\end{split}
+\end{equation}
+
+For the exchange term, the RI expression is
+\begin{equation}
+	\begin{split}
+		K_{ij}^{\sigma} = &\sum_{kl}D_{kl}^{\sigma}\left( ik|jl \right)\\
+		= &\sum_{kl}\sum_{\mu}D_{kl}^{\sigma}M_{ik}^{\mu}M_{jl}^{\mu}\\
+		= &\sum_{a}^{all}W_{a}^{\sigma}\sum_{kl}\sum_{\mu}C_{ka}^{\sigma}C_{la}^{\sigma}M_{ik}^{\mu}M_{jl}^{\mu}\\
+		= &\sum_{\mu}\sum_{a}^{all}W_{a}^{\sigma}\left(\sum_{k}M_{ik}^{\mu}C_{ka}\right)\left(\sum_{l}M_{jl}^{\mu}C_{la}  \right)\\
+		= &\sum_{\mu}\sum_{a}^{N_w}W_{a}^{\sigma}
+		\left(\sum_{k}M_{ik}^{\mu}C_{ka}^{\sigma}\right)\left(\sum_{l}M_{jl}^{\mu}C_{la}^{\sigma}  \right)\\
+		= &\sum_{a}^{N_w}W_{a}^{\sigma}\sum_{\mu}B_{ia}^{\mu\sigma}B_{ja}^{\mu\sigma}\\
+		= &\sum_{\mu}\sum_{a}^{N_w}W_{a}^{\sigma}B_{ia}^{\mu\sigma}B_{ja}^{\mu\sigma}
+	\end{split}
+\end{equation}
+where $N_w$ is the number of orbitals with non-zero electronic occupations.
+
+%The last transformation is achieved due to the Hermitian property of $M_{kl}^{\mu}$ for each $\mu$.
+The total energy of Restricted Hartree-Fock is defined by (Equation 3.184 on Page 150)
+\begin{equation}
+	\begin{split}
+		E_0 =&\left<\Psi_0\left|\hat{H}\right|\Psi_0\right>\\
+		=&\frac{1}{2}\sum_{i}\sum_{j}D_{ji}\left( H_{ij}^{core}+F_{ij} \right)\\
+		=&\left.\frac{1}{2}\sum_{i}\sum_{j}D_{ij}\left( H_{ij}^{core}+F_{ij} \right)\right|_{\textbf{D}\in\mathbb{R}}\\
+		=&\left.\frac{1}{2}\sum_{i}\sum_{j}D_{ij}^{*}\left( H_{ij}^{core}+F_{ij} \right)\right|_{\textbf{D}\in\mathbb{C}}\\
+	\end{split}
+\end{equation}
+However, for Unrestricted Hartree-Fock method, the total energy expression is (Exercise 3.40 on Page 215)
+\begin{equation}
+	\begin{split}
+		E_0=&\frac{1}{2}\sum_{i}\sum_{j}\left[D_{ji}^{\textit{tot}}H_{ij}^{core}+D_{ji}^{\alpha}F_{ij}^{\alpha}+D_{ji}^{\beta}F_{ij}^{\beta} \right]\\
+		   =&\left.\frac{1}{2}\sum_{i}\sum_{j}\left[D_{ij}^{\textit{tot}}H_{ij}^{core}+D_{ij}^{\alpha}F_{ij}^{\alpha}+D_{ij}^{\beta}F_{ij}^{\beta} \right]
+		\right|_{\textbf{D}\in\mathbb{R}}\\
+		   =&\left.\frac{1}{2}\sum_{i}\sum_{j}\left[D_{ij}^{\textit{tot}*}H_{ij}^{core}+D_{ij}^{\alpha *}F_{ij}^{\alpha}
+		+D_{ij}^{\beta *}F_{ij}^{\beta} \right]\right|_{\textbf{D}\in\mathbb{C}}\\
+	\end{split}
+\end{equation}
+
+\newpage
+
+
+\section{The Fock exchange potential in reciprocal space}
+The Fock exchange potential is
+\begin{equation}
+    \begin{split}
+        V_{x}(\boldsymbol{r},\boldsymbol{r}')&=
+        -e^2\sum_{\boldsymbol{q}m}2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}
+        \frac{\phi_{\boldsymbol{q}m}^{*}(\boldsymbol{r}')\phi_{\boldsymbol{q}m}(\boldsymbol{r})}{|\boldsymbol{r}-\boldsymbol{r}'|}\\
+    \end{split}
+\end{equation}
+Here, $\boldsymbol{q}$ is the k point, and therefor $w_{\boldsymbol{q}}$ is the weight of the k-point $\boldsymbol{q}$. $m$ is the band index, and
+therefore $f_{\boldsymbol{q}m}$ is the occupational number of the band $m$ in the k-point $\boldsymbol{q}$.
+
+To expand the orbital $\phi_{\boldsymbol{q}m}$ in plane wave, we have
+\begin{equation}
+    \begin{split}
+        \phi_{\boldsymbol{q}m}(\boldsymbol{r})&=\frac{1}{\sqrt{\boldsymbol{\Omega}}}\sum_{\boldsymbol{G}}
+        C_{\boldsymbol{q}m}(\boldsymbol{G})e^{i(\boldsymbol{q}+\boldsymbol{G})\cdot \boldsymbol{r}}\\
+    \end{split}
+\end{equation}
+Then the Fock exchange potential evolves 
+\begin{equation}
+    \begin{split}
+        V_{x}(\boldsymbol{r},\boldsymbol{r}')&=-\frac{e^2}{\boldsymbol{\Omega}}\sum_{\boldsymbol{q}m}
+        \frac{2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}}{{|\boldsymbol{r}-\boldsymbol{r}'|}}
+        \sum_{\boldsymbol{G}\boldsymbol{G}'}
+        C_{\boldsymbol{q}m}^{*}(\boldsymbol{G}')e^{-i(\boldsymbol{q}+\boldsymbol{G}')\cdot \boldsymbol{r}'}
+        C_{\boldsymbol{q}m}(\boldsymbol{G})e^{i(\boldsymbol{q}+\boldsymbol{G})\cdot \boldsymbol{r}}\\
+    \end{split}
+\end{equation}
+Since, we can do the Fourier transform of the Coulomb operator as:
+\begin{equation}
+    \int d^3\boldsymbol{r}\frac{1}{|\boldsymbol{r}|}e^{-i\boldsymbol{q}\cdot\boldsymbol{r}}=\frac{4\pi}{|\boldsymbol{q}|^2}
+\end{equation}
+And the reverse Fourier transform will be:
+\begin{equation}
+    \begin{split}
+        \frac{1}{|\boldsymbol{r}|}&=\frac{1}{(2\pi)^3}\int d^3\boldsymbol{q}\frac{4\pi}{|\boldsymbol{q}|^2}e^{i\boldsymbol{q}\cdot\boldsymbol{r}}
+        =\frac{1}{2\pi^2}\int d^3\boldsymbol{q}\frac{1}{|\boldsymbol{q}|^2}e^{i\boldsymbol{q}\cdot\boldsymbol{r}}
+        %=4\pi\sum\frac{1}{|\boldsymbol{q}|^2}e^{i\boldsymbol{q}\cdot\boldsymbol{r}}\\
+        %&=\frac{1}{2\pi^2}\sum_{\boldsymbol{q}}\delta\boldsymbol{q}\frac{1}{|\boldsymbol{q}|^2}e^{i\boldsymbol{q}\cdot\boldsymbol{r}}\\
+        %\int d^3\boldsymbol{q}\frac{4\pi}{|\boldsymbol{q}|^2}e^{i\boldsymbol{q}\cdot\boldsymbol{r}}&=\frac{1}{(2\pi)^3}\frac{1}{|\boldsymbol{r}|}\\
+    \end{split}
+\end{equation}
+Insert this equation into the Fock exchange potential
+\begin{equation}
+    \begin{split}
+        V_{x}(\boldsymbol{r},\boldsymbol{r}')&=-\frac{e^2}{2\pi^2\boldsymbol{\Omega}}
+        \sum_{\boldsymbol{q}m}2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}
+        \int d^3\boldsymbol{k}
+        \frac{1}{{|\boldsymbol{k}|^2}}e^{i\boldsymbol{k}\cdot(\boldsymbol{r}-\boldsymbol{r}')}\\
+        &\times \sum_{\boldsymbol{G}\boldsymbol{G}'} C_{\boldsymbol{q}m}^{*}(\boldsymbol{G}')e^{-i(\boldsymbol{q}+\boldsymbol{G}')\cdot \boldsymbol{r}'}
+        C_{\boldsymbol{q}m}(\boldsymbol{G})e^{i(\boldsymbol{q}+\boldsymbol{G})\cdot \boldsymbol{r}}\\
+        &=-\frac{e^2}{2\pi^2\boldsymbol{\Omega}}
+        \int d^3\boldsymbol{k}\sum_{\boldsymbol{G}\boldsymbol{G}'} 
+        \frac{1}{{|\boldsymbol{k}|^2}}\sum_{\boldsymbol{q}m}2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}\\
+        &\times C_{\boldsymbol{q}m}^{*}(\boldsymbol{G}')e^{-i(\boldsymbol{k}+\boldsymbol{q}+\boldsymbol{G}')\cdot \boldsymbol{r}'}
+        C_{\boldsymbol{q}m}(\boldsymbol{G})e^{i(\boldsymbol{k}+\boldsymbol{q}+\boldsymbol{G})\cdot \boldsymbol{r}}\\
+    \end{split}
+\end{equation}
+If we make a change
+\begin{equation}
+    \begin{split}
+        \boldsymbol{k}'&=\boldsymbol{k}+\boldsymbol{q}\\
+        \boldsymbol{k}&=\boldsymbol{q}-\boldsymbol{k}'\\
+    \end{split}
+\end{equation}
+Then
+\begin{equation}
+    \begin{split}
+        V_{x}(\boldsymbol{r},\boldsymbol{r}')&=-\frac{e^2}{2\pi^2\boldsymbol{\Omega}}
+        \int d^3\boldsymbol{k}'\sum_{\boldsymbol{G}\boldsymbol{G}'} 
+        \frac{1}{{|\boldsymbol{q}-\boldsymbol{k}'|^2}}\sum_{\boldsymbol{q}m}2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}\\
+        &\times C_{\boldsymbol{q}m}^{*}(\boldsymbol{G}')e^{-i(\boldsymbol{k}'+\boldsymbol{G}')\cdot \boldsymbol{r}'}
+        C_{\boldsymbol{q}m}(\boldsymbol{G})e^{i(\boldsymbol{k}'+\boldsymbol{G})\cdot \boldsymbol{r}}\\
+        &=\int d^3\boldsymbol{k}\sum_{\boldsymbol{G}\boldsymbol{G}'}
+        e^{i(\boldsymbol{k}+\boldsymbol{G})\cdot \boldsymbol{r}}e^{-i(\boldsymbol{k}+\boldsymbol{G}')\cdot \boldsymbol{r}'}\\
+        &\times-\frac{e^2}{2\pi^2\boldsymbol{\Omega}}\sum_{\boldsymbol{q}m}2w_{\boldsymbol{q}}f_{\boldsymbol{q}m}
+         \frac{C_{\boldsymbol{q}m}^{*}(\boldsymbol{G}')
+        C_{\boldsymbol{q}m}(\boldsymbol{G})}{|\boldsymbol{k}-\boldsymbol{q}|^2}\\
+        &\textcolor{red}{\textbf{?}}\\
+    \end{split}
+\end{equation}
+
+%\begin{equation}
+%    \begin{split}
+%        RF[HSE]&=\frac{4\pi}{r^2}(1-\exp^{-r^2/(4\mu^2)})\\
+%        RR[lr]&=
+%    \end{split}
+%\end{equation}
+
+%\bibliographystyle{plain}
+%\bibliography{note}
+\section{Laplace transform of opposite-spin MP2}
+The opposite-spin component of the second-order correlation energy (PT2) is written as
+\begin{equation}
+    \begin{split}
+		E_{c}^{PT2}&=\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{ab}^{occ.}\sum_{nm}^{vir.}
+		\frac{\left|\sum_{\mu}L_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})R_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')\right|^2}
+        {\epsilon_{a\boldsymbol{k}}+\epsilon_{b\boldsymbol{k}'}-\epsilon_{n\boldsymbol{q}}-\epsilon_{m\boldsymbol{q}'}}\\
+    \end{split}
+\end{equation}
+For simplicity, we define $\Delta_{a\boldsymbol{k},b\boldsymbol{k}'}^{n\boldsymbol{q},m\boldsymbol{q}'}=
+\epsilon_{n\boldsymbol{q}}+\epsilon_{m\boldsymbol{q}'}-\epsilon_{a\boldsymbol{k}}-\epsilon_{b\boldsymbol{k}'}$.
+If we use the Laplace transformation 
+\begin{equation}
+	\begin{split}
+	    \frac {1} {\Delta_{a\boldsymbol{k},b\boldsymbol{k}'}^{n\boldsymbol{q},m\boldsymbol{q}'}}
+	    &= \int_0^{\infty}dt e^{-t\Delta_{a\boldsymbol{k},b\boldsymbol{k}'}^{n\boldsymbol{q},m\boldsymbol{q}'}}\\
+		&= \sum_{q}^{N_{q}}w_{q} e^{-t_q\Delta_{a\boldsymbol{k},b\boldsymbol{k}'}^{n\boldsymbol{q},m\boldsymbol{q}'}}\\
+	\end{split}
+\end{equation}
+to expand the opposite-spin PT2 correlation energy, we have
+\begin{equation}
+    \begin{split}
+		E_{c}^{PT2}&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{ab}^{occ.}\sum_{nm}^{vir.}w_{q}
+		\left|\sum_{\mu}L_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})R_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')\right|^2
+        e^{-t_q\Delta_{a\boldsymbol{k},b\boldsymbol{k}'}^{n\boldsymbol{q},m\boldsymbol{q}'}}\\
+		&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{ab}^{occ.}\sum_{nm}^{vir.}
+		\left|\sum_{\mu}w_{q}^{\frac 1 4}L_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})e^{-\frac{1}{2}t_q(\epsilon_{n\boldsymbol{q}}-\epsilon_{a\boldsymbol{k}})}
+		w_{q}^{\frac 1 4}R_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')e^{-\frac{1}{2}t_q(\epsilon_{m\boldsymbol{q}'}-\epsilon_{b\boldsymbol{k}'})}\right|^2\\
+		&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{ab}^{occ.}\sum_{nm}^{vir.}
+		\left|\sum_{\mu}\bar{L}_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})\bar{R}_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')\right|^2\\
+		&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{ab}^{occ.}\sum_{nm}^{vir.}
+		\sum_{\mu v}\bar{L}_{an}^{\mu *}(\boldsymbol{k},\boldsymbol{q})\bar{L}_{an}^{v}(\boldsymbol{k},\boldsymbol{q})
+		\bar{R}_{bm}^{\mu *}(\boldsymbol{k}',\boldsymbol{q}')\bar{R}_{bm}^{v}(\boldsymbol{k}',\boldsymbol{q}')\\
+		&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{\mu v} 
+		\sum_{an}\bar{L}_{an}^{\mu *}(\boldsymbol{k},\boldsymbol{q})\bar{L}_{an}^{v}(\boldsymbol{k},\boldsymbol{q})
+		\sum_{bm}\bar{R}_{bm}^{\mu *}(\boldsymbol{k}',\boldsymbol{q}')\bar{R}_{bm}^{v}(\boldsymbol{k}',\boldsymbol{q}')\\
+		&=-\frac{1}{N_{\boldsymbol{q}}^3}\sum_{\boldsymbol{\delta k}\boldsymbol{k}\boldsymbol{q}'}
+		\sum_{q}^{N_q}\sum_{\mu v} 
+		\bar{M}_{\mu v}(\boldsymbol{k},\boldsymbol{q})\bar{N}_{\mu v}(\boldsymbol{k}',\boldsymbol{q}')
+    \end{split}
+\end{equation}
+with 
+\begin{equation}
+	\begin{split}
+		\bar{L}_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})
+		&=w_{q}^{\frac 1 4}L_{an}^{\mu}(\boldsymbol{k},\boldsymbol{q})e^{-\frac{1}{2}t_q(\epsilon_{n\boldsymbol{q}}-\epsilon_{a\boldsymbol{k}})}\\
+		\bar{R}_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')
+		&=w_{q}^{\frac 1 4}R_{bm}^{\mu}(\boldsymbol{k}',\boldsymbol{q}')e^{-\frac{1}{2}t_q(\epsilon_{m\boldsymbol{q}'}-\epsilon_{b\boldsymbol{k}'})}\\
+		\bar{M}_{\mu v}(\boldsymbol{k},\boldsymbol{q})
+		&=\sum_{an}\bar{L}_{an}^{\mu *}(\boldsymbol{k},\boldsymbol{q})\bar{L}_{an}^{v}(\boldsymbol{k},\boldsymbol{q})\\
+		&=\sum_{an}w^{\frac 1 2}e^{-t_q(\epsilon_{n\boldsymbol{q}}-\epsilon_{a\boldsymbol{k}})}
+		L_{an}^{\mu *}(\boldsymbol{k},\boldsymbol{q})L_{an}^{v}(\boldsymbol{k},\boldsymbol{q})\\
+		\bar{N}_{\mu v}(\boldsymbol{k}',\boldsymbol{q}')
+		&=\sum_{bm}\bar{R}_{bm}^{\mu *}(\boldsymbol{k}',\boldsymbol{q}')\bar{R}_{bm}^{v}(\boldsymbol{k}',\boldsymbol{q}')\\
+		&=\sum_{bm}w^{\frac 1 2}e^{-t_q(\epsilon_{m\boldsymbol{q}'}-\epsilon_{b\boldsymbol{k}'})}
+		R_{bm}^{\mu *}(\boldsymbol{k}',\boldsymbol{q}')R_{bm}^{v}(\boldsymbol{k}',\boldsymbol{q}')\\
+	\end{split}
+\end{equation}
+
+
+\section{Memory distribution for periodic-PT2}
+
+\end{document}
+

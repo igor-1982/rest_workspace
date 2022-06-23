@@ -1,0 +1,14 @@
+[workspace]
+
+members = [
+    "fdqc",
+    "fdqc-tensors",
+    "parse_json_basis_set",
+    "rust-libcint",
+]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+#panic = "abort"
