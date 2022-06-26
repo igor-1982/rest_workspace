@@ -23,7 +23,7 @@ libcint_path='/share/apps/lib/libcint/build'
 libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
 #
 #3): libhdf5_path: the path to libhdf5.so
-libhdf5_path='/share/apps/rust/HDF5'
+libhdf5_path='/share/apps/rust/HDF5/lib'
 
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
 echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
