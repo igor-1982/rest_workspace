@@ -5,6 +5,7 @@ members = [
     "fdqc-tensors",
     "parse_json_basis_set",
     "rust-libcint",
+    "numgrid-main",
 ]
 
 [profile.release]

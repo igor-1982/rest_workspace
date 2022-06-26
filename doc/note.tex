@@ -33,6 +33,7 @@
 %\tableofcontents
 
 \newpage
+\section{Restricted and Unrestricted Hartree-Fock}
 Refering to Szabo's book for Restricted and Unrestricted Hartree-Fock formulas 
 %Close-shell expression refers to Szabo's book, Equations of 3.124-125, on Pages 140-142; 
 %while open-shell expression refers to Pages 210-214
@@ -125,6 +126,14 @@ However, for Unrestricted Hartree-Fock method, the total energy expression is (E
 		\right|_{\textbf{D}\in\mathbb{R}}\\
 		   =&\left.\frac{1}{2}\sum_{i}\sum_{j}\left[D_{ij}^{\textit{tot}*}H_{ij}^{core}+D_{ij}^{\alpha *}F_{ij}^{\alpha}
 		+D_{ij}^{\beta *}F_{ij}^{\beta} \right]\right|_{\textbf{D}\in\mathbb{C}}\\
+	\end{split}
+\end{equation}
+
+\section{Numerical integration and DFT}
+V. Blum et al. Computer Physics Communications 180 (2009) 2175-2196
+\begin{equation}
+	\begin{split}
+		V_{xc,ij} = &\int d^3\textbf{r}\psi_i\textbf{r}\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
 	\end{split}
 \end{equation}
 
