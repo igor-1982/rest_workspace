@@ -26,11 +26,11 @@ libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
 libhdf5_path='/share/apps/rust/HDF5'
 
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path'/lib: $LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path'/lib:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path' -L '$libhdf5_path'/lib"' >> $HOME/.bash_profile
 
 # make sure gcc with correct version is loaded properly
 gcc_path='/share/apps/GCC/gcc8'
 echo 'export PATH="'$gcc_path'/bin:$PATH"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$gcc_path'/lib: $LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export LD_LIBRARY_PATH="'$gcc_path'/lib:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 echo 'alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
