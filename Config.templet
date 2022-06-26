@@ -14,13 +14,20 @@ git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
 # Some prerequisite libraries for REST, which should be installed and accessable for REST
 #       1) the external libcint for 2-, 3-, and 4-center GTO integrals.
 #       2) the external libopenblas for blas and lapack operations.
+#       3) the external libhdf5 for external initial guess and restart file
 #
 #1): libcint_path: the path to libcint.so
 libcint_path='/share/apps/lib/libcint/build'
 #
 #2): libopenblas_path: the path to libopenblas.so
 libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
+#
+#3): libhdf5_path: the path to libhdf5.so
+libhdf5_path='/share/apps/rust/HDF5'
 
-echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
-echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path'"' >> $HOME/.bash_profile
+echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path' -L '$libhdf5_path'"' >> $HOME/.bash_profile
 
+# make sure gcc with correct version is loaded properly
+gcc_path='/share//share/apps/GCC/gcc8/bin'
+echo 'alias cc='$gcc_path >> $HOME/.bash_profile

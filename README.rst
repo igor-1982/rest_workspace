@@ -5,6 +5,7 @@ Installation
 
    - libopenblas.so
    - libcint.so
+   - gcc version 8.0 or higher
 
 * Build REST::
 
