@@ -29,5 +29,5 @@ echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path:'$L
 echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path' -L '$libhdf5_path'"' >> $HOME/.bash_profile
 
 # make sure gcc with correct version is loaded properly
-gcc_path='/share//share/apps/GCC/gcc8/bin'
+gcc_path='/share/apps/GCC/gcc8/bin'
 echo 'alias cc='$gcc_path >> $HOME/.bash_profile
