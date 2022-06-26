@@ -30,4 +30,4 @@ echo 'export RUSTFLAGS="-L '$libcint_path' -L '$libopenblas_path' -L '$libhdf5_p
 
 # make sure gcc with correct version is loaded properly
 gcc_path='/share/apps/GCC/gcc8/bin'
-echo 'alias cc='$gcc_path >> $HOME/.bash_profile
+echo 'alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
