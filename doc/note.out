@@ -1,5 +1,9 @@
 \BOOKMARK [1][-]{section.1}{Restricted\040and\040Unrestricted\040Hartree-Fock}{}% 1
-\BOOKMARK [1][-]{section.2}{Numerical\040integration\040and\040DFT}{}% 2
-\BOOKMARK [1][-]{section.3}{The\040Fock\040exchange\040potential\040in\040reciprocal\040space}{}% 3
-\BOOKMARK [1][-]{section.4}{Laplace\040transform\040of\040opposite-spin\040MP2}{}% 4
-\BOOKMARK [1][-]{section.5}{Memory\040distribution\040for\040periodic-PT2}{}% 5
+\BOOKMARK [1][-]{section.2}{Restricted\040and\040Unrestricted\040Kohn-Sham}{}% 2
+\BOOKMARK [1][-]{section.3}{Numerical\040integration\040and\040DFT}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Basic\040knowledge\040of\040numerical\040integration\040for\040molecules}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Density\040integration}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{Others}{section.3}% 6
+\BOOKMARK [1][-]{section.4}{The\040Fock\040exchange\040potential\040in\040reciprocal\040space}{}% 7
+\BOOKMARK [1][-]{section.5}{Laplace\040transform\040of\040opposite-spin\040MP2}{}% 8
+\BOOKMARK [1][-]{section.6}{Memory\040distribution\040for\040periodic-PT2}{}% 9

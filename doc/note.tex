@@ -129,13 +129,330 @@ However, for Unrestricted Hartree-Fock method, the total energy expression is (E
 	\end{split}
 \end{equation}
 
-\section{Numerical integration and DFT}
-V. Blum et al. Computer Physics Communications 180 (2009) 2175-2196
+\section{Restricted and Unrestricted Kohn-Sham}
+Similar to the Hartree-Fock approximation, the Kohn-Sham approximation has the close-shell expression of Fock matrix
 \begin{equation}
 	\begin{split}
-		V_{xc,ij} = &\int d^3\textbf{r}\psi_i\textbf{r}\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
+		F_{ij}^{KS}=&H_{ij}^{core}+\sum_{kl}D_{lk}\left[\left( ij|kl \right)-\frac{\alpha}{2}\left(il|kj  \right)\right]
+		+\int d^3\textbf{r}\psi_i(\textbf{r})v_{xc}(\rho,\textbf{r})\psi_j(\textbf{r}) \\
+	=&\left.H_{ij}^{core}+\sum_{kl}D_{kl}\left[\left( ij|kl \right)-\frac{\alpha}{2}\left(ik|jl  \right)\right]\right|_{\textbf{D} \in \mathbb{R}} 
+	+V_{xc,ij} \\
+    \end{split}
+\end{equation}
+where $\alpha$ is the mixing factor of exact exchange. For (semi-)local DFAs, like LDA, GGAs and meta-GGAs, $\alpha=0$
+$V_{xc,ij}=\int d^3\textbf{r}\psi_i(\textbf{r})v_{xc}(\rho,\textbf{r})\psi_j(\textbf{r})$ has no analytic expression, which should be integrated numerically:
+\begin{equation}
+	\begin{split}
+		V_{xc,ij} = &\int d^3\textbf{r}\psi_i(\textbf{r})\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
+          = &\sum_{at}\int d^3p_{at}(\textbf{r})\psi_i(\textbf{r})\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
+          = &\sum_{at,s,t}w(\textbf{r})\psi_i(\textbf{r})\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
 	\end{split}
 \end{equation}
+where $\textbf{r}=\textbf{r}(at,s,t)$ and $w(\textbf{r})=p_{at}(\textbf{r})\cdot w_{rad}(s)\cdot w_{ang}(t)$.
+The only problem remained is to determine the atom-centered radial and angular grid points and their weights.
+
+The total energy of Restricted Kohn-Sham is defined as
+\begin{equation}
+	\begin{split}
+		E_0 =&\left<\Psi_0\left|\hat{H}_{noxc}\right|\Psi_0\right>+E_{xc}\\
+		=&\frac{1}{2}\sum_{i}\sum_{j}D_{ji}\left( H_{ij}^{core}+F_{ij}-V_{xc,ij} \right)+E_{xc}\\
+		=&\left.\frac{1}{2}\sum_{i}\sum_{j}D_{ij}\left( H_{ij}^{core}+F_{ij} \right)-V_{xc}+E_{xc}\right|_{\textbf{D}\in\mathbb{R}}\\
+		=&\left.\frac{1}{2}\sum_{i}\sum_{j}D_{ij}^{*}\left( H_{ij}^{core}+F_{ij}\right)-V_{xc}+E_{xc}\right|_{\textbf{D}\in\mathbb{C}}\\
+	\end{split}
+\end{equation}
+where 
+\begin{equation}
+	\begin{split}
+		V_{xc} = &\frac{1}{2}\sum_{i}\sum_{j}D_{ij}*V_{xc,ij}\\
+	\end{split}
+\end{equation}
+and
+\begin{equation}
+	\begin{split}
+		E_{xc} = &\int d^3\textbf{r}\rho(\textbf{r})\varepsilon_{xc}(\textbf{r})\\
+		= &\sum_{at,s,t}w(\textbf{r})\omega(\textbf{r})\rho(\textbf{r})\varepsilon_{xc}(\textbf{r})\\
+	\end{split}
+\end{equation}
+
+
+
+\section{Numerical integration and DFT}
+\subsection{Basic knowledge of numerical integration for molecules}
+Generally speaking, the three-dimensional molecular integrals have the form of
+\begin{equation}
+	I = \int d^3\textbf{r} F(\textbf{r})
+\end{equation}
+which can be approximated by discrete numerical summations
+\begin{equation}
+	I = \sum_i A_i F(\textbf{r}_i)
+\end{equation}
+where the $\textbf{r}_i$ and $A_i$ are discrete integration points and their respective integration weights.
+
+In quantum chemistry, the orbitals no matter occupied or virtual features a cusp at atomic nuclei. In consequence,
+a better way for this multi-center integration problem is to partition the molecular space into discrete regions
+according to each atom, namely cellular approaches. In Becke's original proposal [see A. D. Becke J. Chem. Phys. 
+88 (4), 15], the cellular approach was established according to a partition function $p_{at}(\textbf{r})$,
+which was called \textit{relative weight function $\omega_n(\textbf{r})$} in the original paper.
+This partition function was assigned to each nucleus $at$ in the system for all $\textbf{r}$ and is normalized at every $\textbf{r}$, 
+\begin{equation}
+	\sum_{at}p_{at}(\textbf{r}) = 1.
+\end{equation}
+Then any arbitrary molecular function $F(\textbf{r})$ can be decomposed into single-center components $F_n(\textbf{r})$
+\begin{equation}
+	F(\textbf{r})=\sum_{at}p_{at}(\textbf{r})F(\textbf{r})=\sum_{at}F_{at}(\textbf{r}).
+\end{equation}
+With this partition, the integration $I$ therefore reduces to a sum of single-center integrations $I_{at}$ over each of the
+nuclei in the system
+\begin{equation}
+	\begin{split}
+		I=&\int d^3\textbf{r}F(\textbf{r})=\sum_{at}\int d^3p_{at}(\textbf{r})F(\textbf{r})\\
+		 =&\sum_{at}\int d^3F_{at}(\textbf{r})=\sum_{at}I_{at}\\
+	 \end{split}
+ \end{equation}
+ The remaining problem is to design a well-behaved partition function $p_{at}(\textbf{r})$, such that each atomic sub-integration
+ $I_{at}$ can be carried out using standard single-center numerical techniques in spherical polar coordinates:
+ \begin{equation}
+	 I_{at}=\int_0^\infty dr \int_0^{2\pi} d\theta \int_0^{\pi} d\phi F_{at}(r,\theta,\phi)r^2\sin(\theta),
+ \end{equation}
+ This 3D integration can be carried out by treating each of $(r,\theta,\phi)$ independently.
+ The standard choice of the grids for the angular part, i.e. $(\theta\in[0,2\pi),\phi\in[0,\pi])$  with a fixed $r$ is 
+ Lebedev's quadratures. In the original paper, Becke chose the Gauss-Chebyshev quadrature of the second kind for the radial
+ integration (for $r\in[0,+\infty)$).
+
+ The current version of REST makes use of the exiting library ``numgrid'' to prepare the numerical integration grids. However,
+ ``numgrid'' provides only a very limiting options to generate the grids:
+ \begin{itemize}
+ \item Partition function $p_{at}$: only Becke's original algorithm
+ \item Radial grid: 1) Lindh-Malmqvist-Gagliardi; 2) Krack-K\"oster
+ \item Angular grid: Lebedev
+ \end{itemize}
+
+ \textbf{\underline{To Do List}}:
+ \begin{itemize}
+	 \item Partition function $p_{at}$: \\
+		   1) Stratmann-Scuseria-Frisch (\url{https://doi.org/10.1016/0009-2614(96)00600-8}), which is a standard choice in many packages\\
+		   2) Laqua-Kussmann-Ochsenfeld (\url{https://doi.org/10.1063/1.5049435}).
+	 \item Radial grids: MultiExp (\url{https://doi.org/10.1002/jcc.10211}).
+	 \item Pruned grids for SG-0, SG-1, SG-2, and SG-3 standard grids. (refer to the code in PySCF)
+\end{itemize}
+
+
+\subsection{Density integration}
+In general, the exchange-correlation energy $E_{xc}$ of semi-local density functional approximations and 
+the corresponding exchange-correlation potential $V_{xc}$ depends on density $\rho$, density gradient 
+$\nabla \rho$ and kinetic density $\tau$. Therefore, we should prepare the tabulated values of these quantities 
+for the numerical integration of $E_{xc}$ and $V_{xc}$.
+
+The spin density $\rho_{\uparrow}$ in the atomic-orbital representation is shown:
+\begin{equation}
+	\begin{split}
+		\rho_{\uparrow}(\textbf{r}) = &\sum_{a}^{occ}W_{a}^{\uparrow}|\phi_a^{\uparrow}(\textbf{r})|^2\\
+		= &\sum_{a}W_{a}^{\uparrow}\sum_{ij}C_{ia}^{\uparrow}C_{ja}^{*\uparrow}\psi_i(\textbf{r})\psi_j^*(\textbf{r})\\
+		= &\sum_{ij}\psi_i(\textbf{r})\psi_j^*(\textbf{r})\sum_{a}W_{a}^{\uparrow}C_{ia}^{\uparrow}C_{ja}^{*\uparrow}\\
+		= &\sum_{ij}\psi_i(\textbf{r})\psi_j^*(\textbf{r})D_{ij}^{\uparrow}\\
+	\end{split}
+\end{equation}
+In consequence, the tabulated density $P_{\uparrow,s}$ is:
+\begin{equation}
+	\begin{split}
+		P_{\uparrow s} = &\sum_{ij}\psi_{is}D_{ij}^{\uparrow}\psi_{js}^{*}\\
+		= &\sum_{ij}\psi_{is}W_{js}\\
+		W = &D\cdot \psi^*\\
+	\end{split}
+\end{equation}
+where the index $s$ is associated with the tabulated grids. The corresponding numerical integration for the total electron number is
+\begin{equation}
+	\begin{split}
+		\int d\textbf{r}^3 \rho_{\uparrow}(\textbf{r}) = &\int d\textbf{r}^3\sum_{ij}\psi_i(\textbf{r})\psi_j^*(\textbf{r})D_{ij}^{\uparrow}\\
+		= &\sum_{s}w_s\sum_{ij}\psi_i(\textbf{r}_s)\psi_j^*(\textbf{r}_s)D_{ij}^{\uparrow}\\
+	\end{split}
+\end{equation}
+
+The atomic-orbital basis function $\psi_i$ is a normalized GTO. At first, we consider a normalized Cartesian GTO 
+$\psi_i = G(a,A,l,m,n) = N*g(a,A,l,m,n)$. Here the normalized GTO $G(a,A,l,m,n)$ and the unnormalized one $g(a,A,l,m,n)$ are defined as 
+\begin{equation}
+	\begin{split}
+	    g(a,A,l,m,n) &= (x-x_{A})^{l}e^{-a (x-x_{A})^2}(y-y_{A})^{m}e^{-a (y-y_{A})^2}(z-z_{A})^{n}e^{-a (z-z_{A})^2}\\
+	                 &= g(a,A,l)g(a,A,m)g(a,A,n)\\
+	    G(a,A,l,m,n) &= G(a,A,l)G(a,A,m)G(a,A,n)\\
+	\end{split}
+\end{equation}
+where  $g(a,A,l) = (x-x_{A})^{l} e^{-a (x-x_{A})^2}$, $G(a,A,l)=N_l g(a,A,l)$, and the normalization factor $N$ is
+\begin{equation}
+	N = N_{l}+N_{m}+N_{n}=\frac{1}{\sqrt{\int g^2 r^2 dr}}
+    = \sqrt{\frac{2^{2l+3} (l+1)! (2a)^{l+1.5}}{(2l+2)!\sqrt{\pi}}}
+\end{equation}
+
+In consequence, a spheric GTO can be expressed as a linear combination of a set of normalized Cartesian GTOs
+\begin{equation}
+	G^{s}(a,A,l,m,n)=\sum_{lmn}T_{lmn}G(a,A,l,m,n)
+\end{equation}
+\textbf{WARNING: at present, the transition matrix $T$ is implemented for only s,p,d.}
+
+For generalized gradient approximations (GGAs), we need 
+\begin{equation}
+	\begin{split}
+	    \sigma[0] &= \nabla \rho_{\alpha}\cdot \nabla \rho_{\alpha}\\
+	    \sigma[1] &= \nabla \rho_{\alpha}\cdot \nabla \rho_{\beta}\\
+	    \sigma[2] &= \nabla \rho_{\beta} \cdot \nabla \rho_{\beta}\\
+    \end{split}
+\end{equation}
+
+The key quantity is the density derivative $\nabla \rho_{\alpha}$
+\begin{equation}
+	\begin{split}
+		\nabla \rho_{\alpha} &= \frac{\partial \rho_{\alpha}} {\partial x}
+		                      + \frac{\partial \rho_{\alpha}} {\partial y}
+							  + \frac{\partial \rho_{\alpha}} {\partial z} \\
+							  &= \nabla_{x} \rho_{\alpha} + \nabla_{y} \rho_{\alpha} + \nabla_{z} \rho_{\alpha} 
+	\end{split}
+\end{equation}
+where
+\begin{equation}
+	\begin{split}
+		\nabla_x \rho_{\alpha} &= \sum_{ij}D_{ij}^{\alpha}\left[(\nabla_x \psi_i)\psi_j + \psi_i(\nabla_x \psi_j^*)\right]\\
+		&= \left.\sum_{ij}D_{ij}^{\alpha}\left[(\nabla_x \psi_i)\psi_j + \psi_i(\nabla_x \psi_j)\right]\right|_{\psi\in\mathbb{R}}\\
+		&= \left.2\sum_{ij}D_{ij}^{\alpha}(\nabla_x \psi_i)\psi_j\right|_{\psi\in\mathbb{R}}\\
+	\end{split}
+\end{equation}
+
+%\begin{equation}
+%	\begin{split}
+%		\nabla \psi_i = \frac{\partial \psi_i} {\partial x} + \frac{\partial \psi_i} {\partial y} + \frac{\partial \psi_i} {\partial z}
+%	\end{split}
+%\end{equation}
+In consequence, 
+\begin{equation}
+	\begin{split}
+		\sigma[0] &= \nabla \rho_{\uparrow} \cdot \nabla \rho_{\uparrow} = \sum_{i=(x,y,z)}\nabla_{i} \rho_{\uparrow}\nabla_{i}\rho_{\uparrow}\\
+	\end{split}
+\end{equation}
+
+Apparently, $\{\nabla_{x}\psi_i,\nabla_{y}\psi_i,\nabla_{z}\psi_i\} $ are the new variables that should be prepared for the evaluation of $\sigma$.
+\begin{equation}
+	\begin{split}
+	    \nabla_{x}\psi_i &= \sum_{lmn}\nabla_{x}G(a,A,l,m,n)\\
+	                     &= \sum_{lmn}N[\nabla_{x}g(a,A,l)]g(a,A,m)g(a,A,n)\\
+	                     &= \sum_{lmn}Ng(a,A,m)g(a,A,n)[\nabla_{x}g(a,A,l)]\\
+	                     &= \sum_{lmn}Ng(a,A,m)g(a,A,n)[l*g(a,A,l-1)-2a*g(a,A,l+1)]\\
+	\end{split}
+\end{equation}
+The last equation in the above formation is a simplification of the following derivations
+\begin{equation}
+	\begin{split}
+		\nabla_x g(a,A,l) &= \frac{\partial}{\partial x}(x-x_A)^l e^{-a (x-x_A)^2}\\
+		&=l(x-x_A)^{l-1} e^{-a (x-x_A)^2} + (x-x_A)^l e^{-a (x-x_A)^2} \frac{\partial}{\partial x}(-a (x-x_A)^2)\\
+		&=l*g(a,A,l-1) -2a (x-x_A)^{l+1} e^{-a (x-x_A)^2}\\
+		&=l*g(a,A,l-1) -2a*g(a,A,l+1)\\
+		&=\left[l(x-x_A)^{l-1}-2a(x-x_A)^{l+1}\right] e^{-a (x-x_A)^2}\\
+	\end{split}
+\end{equation}
+
+For GGAs, we put the variables \{$\rho$, $\sigma_i$ with $i=(\uparrow\uparrow, \uparrow\downarrow, \downarrow\downarrow)$\} into libxc and obtain 
+\begin{equation}
+	\begin{split}
+	    v_\rho=\frac{\partial \varepsilon_{xc}}{\partial \rho}\\
+		v_{\sigma_i}=\frac{\partial \varepsilon_{xc}}{\partial \sigma_i}\\
+    \end{split}
+\end{equation}
+
+For close-shell case (spin-channel = 1)
+\begin{equation}
+	\begin{split}
+		V_{xc,ij} = &\int d^3\textbf{r}\psi_i(\textbf{r})\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
+		            &\int d^3\textbf{r}\left[
+					  \psi_i(\textbf{r})\hat{v}_{\rho}(\textbf{r})\psi_j(\textbf{r}) +
+					  2\psi_i(\textbf{r})(\hat{v}_{\sigma_0}(\textbf{r})\nabla\rho(\textbf{r}))\cdot\nabla\psi_j(\textbf{r}) +
+					  2\psi_j(\textbf{r})(\hat{v}_{\sigma_0}(\textbf{r})\nabla\rho(\textbf{r}))\cdot\nabla\psi_i(\textbf{r})
+					\right]\\
+	\end{split}
+\end{equation}
+
+
+\subsection{Others}
+\begin{equation}
+	\begin{split}
+		V_{xc,ij} = &\int d^3\textbf{r}\psi_i\textbf{r}\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})
+	\end{split}
+\end{equation}
+Following the reference of V. Blum et al. Computer Physics Communications 180 (2009) 2175-2196. (Page 9, starting from Eq. 15),
+the integration can be formally divided into localized atom-centered pieces by a ``partition of unity''
+\begin{equation}
+	\begin{split}
+		V_{xc,ij} = &\sum_{at}\int d^3p_{at}(\textbf{r})\psi_i\textbf{r}\hat{v}_{xc}(\textbf{r})\psi_j(\textbf{r})\\
+	\end{split}
+\end{equation}
+where $p_{at}(\textbf{r})$ is the atom-centered partition function, which is defined by
+\begin{equation}
+	p_{at}(\textbf{r})=\frac{g_{at}(\textbf{r})}{\sum_{at'}g_{at'}(\textbf{r})}
+\end{equation}
+The normalizing sum over $at'$ in the denominator runs over all atoms in the system, and 
+\textit{$g_{at}$ is a strongly peaked function about its originating atom}.
+
+Under this formula, each single-atom integrand is integrated on its own grid of $N_r$ spherical integration shells 
+$r(s)$ ($s=1,\dots, N_r$) with the corresponding weight of $w_{rad}(s)$.
+Meanwhile the angular integration points $\Omega_t$ with tabulated integration weights $w_{ang}(t)$ are distributed so as to integrate angular
+momentum functions up to a certain order exactly (often called Lebedev grids).
+
+
+%About the transformation between Cartesian and spheric GTOs
+
+Here is the transformation for l=4 and spherical harmonic GTOs $G_i(4,x)$
+\begin{equation}
+	\begin{split}
+		G_i(4,0) = &G(0,0,4)+\frac{3}{8}(G(4,0,0)+G(0,4,0))-\frac{3\sqrt{3}}{\sqrt{35}}(G(2,0,2)+G(0,2,2)-\frac{1}{4}G(2,2,0))\\
+		G_i(4,1) = &\sqrt{\frac{5}{7}}(G(1,0,3)+iG(0,1,3))
+		          -\frac{3\sqrt{5}}{4\sqrt{7}}(G(3,0,1)+iG(0,3,1))-\frac{3}{4\sqrt{7}}(G(1,2,1)+iG(2,1,1))\\
+		G_i(4,-1) = &\sqrt{\frac{5}{7}}(G(1,0,3)-iG(0,1,3))
+		          -\frac{3\sqrt{5}}{4\sqrt{7}}(G(3,0,1)-iG(0,3,1))-\frac{3}{4\sqrt{7}}(G(1,2,1)-iG(2,1,1))\\
+		G_i(4,2) = &\frac{3\sqrt{3}}{2\sqrt{14}}(G(2,0,2)-G(0,2,2))+\frac{3i}{\sqrt{14}}G(1,1,2) \\
+		          &-\frac{\sqrt{5}}{4\sqrt{2}}(G(4,0,0)-G(0,4,0))-\frac{i\sqrt{5}}{2\sqrt{14}}(G(3,1,0)+G(1,3,0))\\
+		G_i(4,-2) = &\frac{3\sqrt{3}}{2\sqrt{14}}(G(2,0,2)-G(0,2,2))-\frac{3i}{\sqrt{14}}G(1,1,2) \\
+		          &-\frac{\sqrt{5}}{4\sqrt{2}}(G(4,0,0)-G(0,4,0))+\frac{i\sqrt{5}}{2\sqrt{14}}(G(3,1,0)+G(1,3,0))\\
+		G_i(4,3) = &\frac{\sqrt{5}}{4}(G(3,0,1)-iG(0,3,1))-\frac{3}{4}(G(1,2,1)-iG(2,1,1))\\
+		G_i(4,-3) = &\frac{\sqrt{5}}{4}(G(3,0,1)+iG(0,3,1))-\frac{3}{4}(G(1,2,1)+iG(2,1,1))\\
+		G_i(4,4) = &\frac{\sqrt{35}}{8\sqrt{2}}(G(4,0,0)+G(0,4,0))-\frac{3\sqrt{3}}{4\sqrt{2}}G(2,2,0)+i\sqrt{\frac{5}{8}}(G(3,1,0)-G(1,3,0))\\
+		G_i(4,-4) = &\frac{\sqrt{35}}{8\sqrt{2}}(G(4,0,0)+G(0,4,0))-\frac{3\sqrt{3}}{4\sqrt{2}}G(2,2,0)-i\sqrt{\frac{5}{8}}(G(3,1,0)-G(1,3,0))\\
+	\end{split}
+\end{equation}
+The real spheric GTOs $G_r(4,x)$ are than defined as
+\begin{equation}
+	\begin{split}
+		G_r(4,0) = & G_i(4,0)\\
+		G_r(4,1) = &\frac{1}{\sqrt{2}}\left(G_i(4,1)+G_i(4,-1)\right)\\
+		         = &\frac{2}{\sqrt{2}}\left(\sqrt{\frac{5}{7}}G(1,0,3)-\frac{3\sqrt{5}}{4\sqrt{7}}G(3,0,1)-\frac{3}{4\sqrt{7}}G(1,2,1)\right)\\
+				 = &\sqrt{\frac{10}{7}}G(1,0,3)-\frac{3\sqrt{10}}{4\sqrt{7}}G(3,0,1)-\frac{3\sqrt{2}}{4\sqrt{7}}G(1,2,1)\\
+		G_r(4,-1) = &\frac{-i}{\sqrt{2}}\left(G_i(4,1)-G_i(4,-1)\right)\\
+		         = &\frac{2}{\sqrt{2}}\left(\sqrt{\frac{5}{7}}G(0,1,3)-\frac{3\sqrt{5}}{4\sqrt{7}}G(0,3,1)-\frac{3}{4\sqrt{7}}G(2,1,1)\right)\\
+				 = &\sqrt{\frac{10}{7}}G(0,1,3)-\frac{3\sqrt{10}}{4\sqrt{7}}G(0,3,1)-\frac{3\sqrt{2}}{4\sqrt{7}}G(2,1,1)\\
+		G_r(4,2) = &\frac{1}{\sqrt{2}}\left(G_i(4,2)+G_i(4,-2)\right)\\
+		         = &\frac{2}{\sqrt{2}}\left(\frac{3\sqrt{3}}{2\sqrt{14}}(G(2,0,2)-G(0,2,2))-\frac{\sqrt{5}}{4\sqrt{2}}(G(4,0,0)-G(0,4,0))\right)\\
+		         = &\frac{3\sqrt{3}}{2\sqrt{7}}(G(2,0,2)-G(0,2,2))-\frac{\sqrt{5}}{4}(G(4,0,0)-G(0,4,0))\\
+		G_r(4,-2) = &\frac{-i}{\sqrt{2}}\left(G_i(4,2)-G_i(4,-2)\right)\\
+		         =&\frac{-2i}{\sqrt{2}}\left(\frac{3i}{\sqrt{14}}G(1,1,2)-\frac{i\sqrt{5}}{2\sqrt{14}}(G(3,1,0)+G(1,3,0))\right)\\
+		         =&\frac{3}{\sqrt{7}}G(1,1,2)-\frac{\sqrt{5}}{2\sqrt{7}}(G(3,1,0)+G(1,3,0))\\
+		G_r(4,3) = &\frac{1}{\sqrt{2}}\left(G_i(4,3)+G_i(4,-3)\right)\\
+		         = &\frac{2}{\sqrt{2}}\left(\frac{\sqrt{5}}{4}G(3,0,1)-\frac{3}{4}G(1,2,1)\right)\\
+				 = &\frac{\sqrt{10}}{4}G(3,0,1)-\frac{3\sqrt{2}}{4}G(1,2,1)\\
+		G_r(4,-3) = &\frac{-i}{\sqrt{2}}\left(G_i(4,3)-G_i(4,-3)\right)\\
+		        = &\frac{-2i}{\sqrt{2}}\left(-\frac{i\sqrt{5}}{4}G(0,3,1)+\frac{3i}{4}G(2,1,1)\right)\\
+				= &-\frac{\sqrt{10}}{4}G(0,3,1)+\frac{3\sqrt{2}}{4}G(2,1,1)\\
+	\end{split}
+\end{equation}
+\begin{equation}
+	\begin{split}
+		G_r(4,4) = &\frac{1}{\sqrt{2}}\left(G_i(4,4)+G_i(4,-4)\right)\\
+		         =&\frac{2}{\sqrt{2}}\left(\frac{\sqrt{35}}{8\sqrt{2}}(G(4,0,0)+G(0,4,0))-\frac{3\sqrt{3}}{4\sqrt{2}}G(2,2,0)\right)\\
+				 =&\frac{\sqrt{35}}{8}(G(4,0,0)+G(0,4,0))-\frac{3\sqrt{3}}{4}G(2,2,0)\\
+		G_r(4,-4) = &\frac{-i}{\sqrt{2}}\left(G_i(4,4)-G_i(4,-4)\right)\\
+		          = &\frac{-2i}{\sqrt{2}}\left(i\sqrt{\frac{5}{8}}(G(3,1,0)-G(1,3,0))\right)\\
+				  = &\frac{\sqrt{5}}{2}(G(3,1,0)-G(1,3,0))\\
+	\end{split}
+\end{equation}
+
+
+
+
 
 \newpage
 

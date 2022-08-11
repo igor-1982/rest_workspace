@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/Debian) (preloaded format=xelatex 2021.8.6)  26 JUN 2022 20:40
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/Debian) (preloaded format=xelatex 2021.8.6)  10 AUG 2022 00:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -426,31 +426,29 @@ File: se-ascii-print.def 2019/11/29 v1.12 stringenc: Printable ASCII characters
 )
 [1
 
-] [2] [3] [4] [5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 303.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 303.
+] [2] [3] [4] [5] [6] [7]
+Overfull \hbox (14.8679pt too wide) detected at line 417
+[]
+ []
+
+[8] [9] [10] [11] [12]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 620.
+ [13]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 620.
  (./note.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 303.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 303.
-
-
-Package rerunfilecheck Warning: File `note.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `note.out':
-(rerunfilecheck)             Before: DFC8D6549DD07FE8D09B3D691DB5495C;265
-(rerunfilecheck)             After:  5FDEE9A7208401B46C8A6A7B59A2BF2E;422.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 303.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 620.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 620.
+Package rerunfilecheck Info: File `note.out' has not changed.
+(rerunfilecheck)             Checksum: 513AF9AFDCE4697C4A99A86A29A0ABD6;750.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 620.
  ) 
 Here is how much of TeX's memory you used:
- 9772 strings out of 479819
- 139888 string characters out of 5895847
- 410949 words of memory out of 5000000
- 26736 multiletter control sequences out of 15000+600000
- 545576 words of font info for 85 fonts, out of 8000000 for 9000
+ 9786 strings out of 479819
+ 140221 string characters out of 5895847
+ 412106 words of memory out of 5000000
+ 26743 multiletter control sequences out of 15000+600000
+ 545616 words of font info for 90 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  34i,22n,45p,239b,324s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on note.pdf (6 pages).
+Output written on note.pdf (13 pages).

@@ -1,0 +1,38 @@
+{"ctrl" : {
+     "print_level":               1,
+     "xc":                        "x3lyp",
+     "basis_path":                "/home/igor/Documents/Package-Pool/Rust/rest/basis-set-pool/cc-pVQZ",
+     "basis_type":                "spheric",
+     "auxbas_path":               "/home/igor/Documents/Package-Pool/Rust/rest/basis-set-pool/def2-SVP-JKFIT/",
+     "eri_type":                  "ri-v",
+     "auxbas_type":               "spheric",
+     "guessfile":                 "init_guess.chk.0",
+     "chkfile":                   "none",
+     "charge":                   -1.0,
+     "spin":                      2.0,
+     "spin_polarization":         true,
+     "radial_precision":          1.0e-9,
+     "min_num_angular_points":    302,
+     "max_num_angular_points":    302,
+     "hardness":                  3,
+     "external_grids":            "grids-pvqz",
+     "mixer":                     "diis",
+     "num_max_diis":              8,
+     "start_diis_cycle":          1,
+     "mix_param":                 0.8,
+     "max_scf_cycle":             100,
+     "scf_acc_rho":               1.0e-5,
+     "scf_acc_eev":               1.0e-5,
+     "scf_acc_etot":              1.0e-8,
+     "num_threads":               3
+ },
+ "geom" : {
+     "name": "H2, example",
+     "unit": "Angstrom",
+     "position": [
+             "H   0.0000000000      0.0000000000      0.0000000000",
+             "H   0.7600000000      0.0000000000      0.0000000000"
+     ]
+ }
+}
+
