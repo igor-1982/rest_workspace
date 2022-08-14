@@ -6,7 +6,7 @@ import scipy
 from time import ctime, time
 import numgrid
 
-lib.num_threads(1)
+lib.num_threads(6)
 TimeStart = time()
 mol = gto.Mole(
         atom='''

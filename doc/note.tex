@@ -267,6 +267,32 @@ where the index $s$ is associated with the tabulated grids. The corresponding nu
 		= &\sum_{s}w_s\sum_{ij}\psi_i(\textbf{r}_s)\psi_j^*(\textbf{r}_s)D_{ij}^{\uparrow}\\
 	\end{split}
 \end{equation}
+Another way to evaluate density more efficiently is
+\begin{equation}
+	\begin{split}
+		\rho_{\uparrow s}=\rho_{\uparrow}(\textbf{r}_s) = &\sum_{a}^{occ}W_{a}^{\uparrow}|\phi_a^{\uparrow}(\textbf{r}_s)|^2\\
+		= &\sum_{a}W_{a}^{\uparrow}\sum_{ij}C_{ia}^{\uparrow}C_{ja}^{*\uparrow}\psi_i(\textbf{r}_s)\psi_j^*(\textbf{r}_s)\\
+		= &\sum_{a}\sum_{i}W_{a}^{\uparrow,\frac{1}{2}}C_{ia}^{\uparrow}\psi_i(\textbf{r}_s)
+	    	\sum_{j}W_{a}^{\uparrow,\frac{1}{2}}C_{ja}^{*\uparrow}\psi_j^*(\textbf{r}_s)\\
+	\end{split}
+\end{equation}
+Here, we define
+\begin{equation}
+	\begin{split}
+	M_{as}^{\uparrow}=&\sum_{i}W_{a}^{\uparrow,\frac{1}{2}}C_{ia}^{\uparrow}\psi_{i}(\textbf{r}_s)\\
+	                 =&\sum_{i}N_{ia}^{\uparrow}\psi_{is}\\
+	                 =&N^{\uparrow T}\cdot \Psi\\
+	\end{split}
+\end{equation}
+Then
+\begin{equation}
+	\begin{split}
+		\rho_{\uparrow s}
+		= &\sum_{a}\sum_{i}W_{a}^{\uparrow,\frac{1}{2}}C_{ia}^{\uparrow}\psi_i(\textbf{r}_s)
+	    	\sum_{j}W_{a}^{\uparrow,\frac{1}{2}}C_{ja}^{*\uparrow}\psi_j^*(\textbf{r}_s)\\
+			= &\sum_{a}M_{as}^{\uparrow} * M_{as}^{\uparrow}\\
+	\end{split}
+\end{equation}
 
 The atomic-orbital basis function $\psi_i$ is a normalized GTO. At first, we consider a normalized Cartesian GTO 
 $\psi_i = G(a,A,l,m,n) = N*g(a,A,l,m,n)$. Here the normalized GTO $G(a,A,l,m,n)$ and the unnormalized one $g(a,A,l,m,n)$ are defined as 
@@ -287,7 +313,7 @@ In consequence, a spheric GTO can be expressed as a linear combination of a set 
 \begin{equation}
 	G^{s}(a,A,l,m,n)=\sum_{lmn}T_{lmn}G(a,A,l,m,n)
 \end{equation}
-\textbf{WARNING: at present, the transition matrix $T$ is implemented for only s,p,d.}
+\textbf{WARNING: at present, the transition matrix $T$ is implemented for only s,p,d,f,g.}
 
 For generalized gradient approximations (GGAs), we need 
 \begin{equation}
@@ -313,6 +339,16 @@ where
 		\nabla_x \rho_{\alpha} &= \sum_{ij}D_{ij}^{\alpha}\left[(\nabla_x \psi_i)\psi_j + \psi_i(\nabla_x \psi_j^*)\right]\\
 		&= \left.\sum_{ij}D_{ij}^{\alpha}\left[(\nabla_x \psi_i)\psi_j + \psi_i(\nabla_x \psi_j)\right]\right|_{\psi\in\mathbb{R}}\\
 		&= \left.2\sum_{ij}D_{ij}^{\alpha}(\nabla_x \psi_i)\psi_j\right|_{\psi\in\mathbb{R}}\\
+	\end{split}
+\end{equation}
+
+Another way to evalute the density derivitative more efficiently:
+\begin{equation}
+	\begin{split}
+		\nabla_x \rho_{\alpha} &= 2\sum_{ij}D_{ij}^{\alpha}(\nabla_x \psi_i)\psi_j\\
+		&=2\sum_{ij}\sum_{a}W_{a}^{\alpha}C_{ia}^{\alpha}C_{ja}^{\alpha}(\nabla_x \psi_i)\psi_j\\
+		&=2\sum_{a}W_{a}^{\alpha}\sum_{i}C_{ia}^{\alpha}(\nabla_x \psi_i)\sum_{j}C_{ja}^{\alpha}\psi_j\\
+		&=2\sum_{a}\sum_{i}\sqrt{W_{a}^{\alpha}}C_{ia}^{\alpha}(\nabla_x \psi_i)\sum_{j}\sqrt{W_{a}^{\alpha}}C_{ja}^{\alpha}\psi_j\\
 	\end{split}
 \end{equation}
 
