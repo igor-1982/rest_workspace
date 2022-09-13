@@ -1,0 +1,10 @@
+Cargo.lock
+Config
+fdqc-tensors/
+fdqc/
+parse_json_basis_set/
+rust-libcint/
+target/
+doc/*.aux
+doc/*.log
+doc/*.out
