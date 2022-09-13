@@ -2,6 +2,7 @@
 import pyscf
 import numpy
 from pyscf import gto, scf, ci,df,lib
+from pyscf.lib import chkfile
 import scipy
 from time import ctime, time
 lib.num_threads(6)
@@ -14,9 +15,13 @@ mol = gto.Mole(
           H       -2.5388400276      2.7556271745     -0.4338224694''',
          charge=0,spin=0,basis='aug-cc-pv5z',verbose=4
       ).build()
-mf = scf.RHF(mol).density_fit(auxbasis="def2-tzvp-jkfit")
-mf.init_guess = '1e'
-mf.diis = 'diis'
-print("Total energy:",mf.kernel())
+method = scf.RHF(mol).density_fit(auxbasis="def2-tzvp-jkfit")
+method.diis = 'diis'
+D = method.get_init_guess(mol,'1e')
+method.init_guess = '1e'
+method.chkfile='init_guess.chk'
+chkfile.save_mol(mol,method.chkfile)
+chkfile.dump(method.chkfile,"init_guess",D)
+print("Total energy:",method.kernel())
 print("Total job time: %10.2f(wall)" %(time()-TimeStart))
 

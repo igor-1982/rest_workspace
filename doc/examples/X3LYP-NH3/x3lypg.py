@@ -4,7 +4,6 @@ import numpy
 from pyscf import gto, scf, ci,df,lib, dft
 import scipy
 from time import ctime, time
-import numgrid
 
 lib.num_threads(6)
 TimeStart = time()
