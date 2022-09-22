@@ -8,7 +8,7 @@
      "auxbas_type":               "spheric",
      "charge":                    0.0,
      "spin":                      1.0,
-     "spin_polarization":         false,
+     "spin_polarization":         true,
      "mixer":                     "diis",
      "num_max_diis":              8,
      "start_diis_cycle":          10,

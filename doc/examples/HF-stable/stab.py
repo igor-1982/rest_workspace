@@ -8,6 +8,14 @@ tools.dump_mat.dump_rec(mf.stdout, mf.mo_coeff, ncol=10)
 mf.verbose = 9
 mf.stability(external=False)
 
+mf2 = mf.to_uhf()
+mf2.verbose = 4
+mf2.run()
+tools.dump_mat.dump_rec(mf2.stdout, mf2.mo_coeff[0], ncol=10)
+tools.dump_mat.dump_rec(mf2.stdout, mf2.mo_coeff[1], ncol=10)
+mf2.verbose = 9
+mf2.stability()
+
 exit()
 from pyscf import tdscf
 import scipy
