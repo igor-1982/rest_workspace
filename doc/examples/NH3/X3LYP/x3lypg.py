@@ -17,8 +17,8 @@ mol = gto.Mole(
     ).build()
 method = dft.RKS(mol).density_fit(auxbasis="def2-SVP-JKFIT")
 method.xc = 'x3lypg'
-method.init_guess = '1e'
-method.grids.becke_scheme = dft.original_becke
-method.grids.level = 3
+method.init_guess = 'sap'
+#method.grids.becke_scheme = dft.original_becke
+#method.grids.level = 3
 print('Default DFT(X3LYPG).  E = %.12f' % method.kernel())
 print("Total job time: %10.2f(wall)" %(time()-TimeStart))

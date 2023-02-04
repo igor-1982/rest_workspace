@@ -1,9 +1,9 @@
 {"ctrl" : {
      "print_level":               1,
      "xc":                        "hf",
-     "basis_path":                "../../../basis-set-pool/cc-pVDZ",
+     "basis_path":                "../../../../basis-set-pool/cc-pVDZ",
      "basis_type":                "spheric",
-     "auxbas_path":               "../../../basis-set-pool/def2-SVP-JKFIT",
+     "auxbas_path":               "../../../../basis-set-pool/def2-SVP-JKFIT",
      "eri_type":                  "ri-v",
      "auxbas_type":               "spheric",
      "charge":                    0.0,
@@ -25,7 +25,7 @@
      "unit": "angstrom",
      "position": [
              "H  0.0      0.0      0.0",
-             "H  0.0      0.0      1.0"
+             "H  0.0      0.0      0.76"
      ]
  }
 }
