@@ -5,7 +5,7 @@ from pyscf import gto, scf, ci,df,lib, dft
 import scipy
 from time import ctime, time
 
-lib.num_threads(6)
+lib.num_threads(1)
 TimeStart = time()
 mol = gto.Mole(
         atom='''
@@ -17,7 +17,7 @@ mol = gto.Mole(
     ).build()
 method = dft.RKS(mol).density_fit(auxbasis="def2-SVP-JKFIT")
 method.xc = 'x3lypg'
-method.init_guess = 'sap'
+method.init_guess = 'vsap'
 #method.grids.becke_scheme = dft.original_becke
 #method.grids.level = 3
 print('Default DFT(X3LYPG).  E = %.12f' % method.kernel())
