@@ -12,7 +12,7 @@ mol = gto.Mole(
         atom='''
          H       0.0000 0.0000 0.0000
          H       0.7600 0.0000 0.0000''',
-        charge=-1,spin=1,basis='cc-pVQZ',verbose=4
+        charge=-1,spin=1,basis='cc-pVDZ',verbose=4
     ).build()
 #method = scf.UHF(mol).density_fit(auxbasis="def2-tzvp-jkfit")
 method = dft.UKS(mol).density_fit(auxbasis="def2-tzvp-jkfit")
