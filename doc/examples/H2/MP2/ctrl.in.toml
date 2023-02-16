@@ -1,6 +1,6 @@
 [ctrl]
-     print_level =          1            # print level: 1 for the simplest output
-     xc =                   "mp2"        # indicating that the MP2 method is invoked
+     print_level =          1
+     xc =                   "mp2"
      basis_path =           "../../../../basis-set-pool/cc-pVDZ"
      basis_type =           "spheric"
      auxbas_path =          "../../../../basis-set-pool/def2-SVP-JKFIT"

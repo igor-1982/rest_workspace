@@ -1,7 +1,7 @@
 [ctrl]
      "print_level"=              1
      "xc"=                       "x3lyp"
-     "basis_path"=               "./6-31+G*"
+     "basis_path"=               "../../../../basis-set-pool/cc-pVQZ"
      "basis_type"=               "spheric"
      "auxbas_path"=              "../../../../basis-set-pool/def2-SVP-JKFIT/"
      "eri_type"=                 "ri-v"
