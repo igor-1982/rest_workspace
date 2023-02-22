@@ -1,11 +1,10 @@
 [workspace]
 
 members = [
-    "fdqc",
     "fdqc-tensors",
     "parse_json_basis_set",
-    "rust-libcint",
-#    "numgrid",
+    "fdqc",
+    "rust-libcint"
 ]
 
 [profile.release]
