@@ -3,20 +3,28 @@
 remote=$1
 
 export rest_repo_path="/share/repo/REST/fdqc.mirror"
-git clone $remote$rest_repo_path rest
+[ ! -d rest ] && git clone $remote$rest_repo_path rest
 export rest_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
-git clone $remote$rest_tensor_repo_path rest_tensors
+[ ! -d rest_tensors ] && git clone $remote$rest_tensor_repo_path rest_tensors
 export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
-git clone $remote$rust_libcint_repo_path rust_libcint 
+[ ! -d rust_libcint ] && git clone $remote$rust_libcint_repo_path rust_libcint
 export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
-git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
+[ ! -d parse_json_basis_set ] && git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
 
 # Some prerequisite libraries for REST, which should be installed and accessable for REST
 
 REST_HOME="$HOME/export/REST"
-# for the native fortran library "restmatr.f90", specifiy:
-#  1) the fortran compiler
+# for the native fortran library "restmatr.f90":
+#  1) specify the fortran compiler
 REST_FORTRAN_COMPILER="ifort"
+if ! command -v $REST_FORTRAN_COMPILER &> /dev/null
+then
+  echo "The fortran compiler $REST_FORTRAN_COMPILER could not be found. Please use an available fortran compiler"
+  exit
+else
+  echo "The fortran compiler $REST_FORTRAN_COMPILER is available"
+fi
+
 echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
 #  2) the path to access the fortrain file
 REST_EXT_DIR="$REST_HOME/rest_tensors/src/external_libs"
@@ -41,10 +49,8 @@ echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
 REST_XC_DIR="/share/apps/rust/libxc"
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
 
-
-
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path'/lib:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export LD_LIBRARY_PATH="'$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 
 # make sure gcc with correct version is loaded properly
 gcc_path='/share/apps/GCC/gcc8'
