@@ -12,6 +12,16 @@ export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mir
 git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
 
 # Some prerequisite libraries for REST, which should be installed and accessable for REST
+
+REST_HOME="$HOME/export/REST"
+# for the native fortran library "restmatr.f90", specifiy:
+#  1) the fortran compiler
+REST_FORTRAN_COMPILER="ifort"
+echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
+#  2) the path to access the fortrain file
+REST_EXT_DIR="$REST_HOME/rest_tensors/src/external_libs"
+echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
+
 #1): libcint_path: the path to libcint.so
 libcint_path='/share/apps/lib/libcint/build'
 REST_CINT_DIR="/share/apps/rust/libcint/build"
@@ -31,13 +41,6 @@ echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
 REST_XC_DIR="/share/apps/rust/libxc"
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
 
-# for the native fortran library "restmatr.f90", specifiy:
-#  1) the fortran compiler
-REST_FORTRAN_COMPILER="ifort"
-echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
-#  2) the path to access the fortrain file
-REST_EXT_DIR="/share/home/wenxinzy/export/REST/rest_tensors/src/external_libs"
-echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
 
 
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile

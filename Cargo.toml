@@ -4,7 +4,7 @@ members = [
     "rest_tensors",
     "parse_json_basis_set",
     "rest",
-    "rust-libcint"
+    "rust_libcint"
 ]
 
 [profile.release]
