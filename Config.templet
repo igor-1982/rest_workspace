@@ -2,34 +2,44 @@
 #remote should be "ID@HOST:
 remote=$1
 
-export fdqc_repo_path="/share/repo/REST/fdqc.mirror"
-git clone $remote$fdqc_repo_path fdqc
-export fdqc_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
-git clone $remote$fdqc_tensor_repo_path fdqc-tensors
+export rest_repo_path="/share/repo/REST/fdqc.mirror"
+git clone $remote$fdqc_repo_path rest
+export rest_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
+git clone $remote$rest_tensor_repo_path rest-tensors
 export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
 git clone $remote$rust_libcint_repo_path rust\-libcint 
 export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
 git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
-#export numgrid_repo_path="/share/repo/REST/numgrid.mirror"
-#git clone $remote$numgrid_repo_path numgrid
 
 # Some prerequisite libraries for REST, which should be installed and accessable for REST
-#       1) the external libcint for 2-, 3-, and 4-center GTO integrals.
-#       2) the external libopenblas for blas and lapack operations.
-#       3) the external libhdf5 for external initial guess and restart file
-#
 #1): libcint_path: the path to libcint.so
 libcint_path='/share/apps/lib/libcint/build'
-#
+REST_CINT_DIR="/share/apps/rust/libcint/build"
+echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
+ 
 #2): libopenblas_path: the path to libopenblas.so
 libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
-#
+REST_BLAS_DIR="/share/apps/rust/OpenBLAS-0.3.17"
+echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
+ 
 #3): libhdf5_path: the path to libhdf5.so
 libhdf5_path='/share/apps/rust/HDF5'
+REST_HDF5_DIR="/share/apps/rust/HDF5/lib"
+echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
+
+#4): the path to libxc.so
+export REST_XC_DIR="/share/apps/rust/libxc"
+echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
+
+# for the native fortran library "restmatr.f90", specifiy:
+#  1) the fortran compiler
+REST_FORTRAN_COMPILER="ifort"
+#  2) the path to access the fortrain file
+REST_EXT_DIR="/share/home/wenxinzy/export/REST/rest_tensors/src/external_libs"
+
 
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
 echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path'/lib:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
-echo 'export RUSTFLAGS="-L '$libcint_path' -lcint -L '$libopenblas_path' -L -lopenblas -L '$libhdf5_path'/lib"' >> $HOME/.bash_profile
 
 # make sure gcc with correct version is loaded properly
 gcc_path='/share/apps/GCC/gcc8'
