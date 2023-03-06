@@ -3,11 +3,11 @@
 remote=$1
 
 export rest_repo_path="/share/repo/REST/fdqc.mirror"
-git clone $remote$fdqc_repo_path rest
+git clone $remote$rest_repo_path rest
 export rest_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
-git clone $remote$rest_tensor_repo_path rest-tensors
+git clone $remote$rest_tensor_repo_path rest_tensors
 export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
-git clone $remote$rust_libcint_repo_path rust\-libcint 
+git clone $remote$rust_libcint_repo_path rust_libcint 
 export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
 git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
 
@@ -28,14 +28,16 @@ REST_HDF5_DIR="/share/apps/rust/HDF5/lib"
 echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
 
 #4): the path to libxc.so
-export REST_XC_DIR="/share/apps/rust/libxc"
+REST_XC_DIR="/share/apps/rust/libxc"
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
 
 # for the native fortran library "restmatr.f90", specifiy:
 #  1) the fortran compiler
 REST_FORTRAN_COMPILER="ifort"
+echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
 #  2) the path to access the fortrain file
 REST_EXT_DIR="/share/home/wenxinzy/export/REST/rest_tensors/src/external_libs"
+echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
 
 
 echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
@@ -45,4 +47,4 @@ echo 'export LD_LIBRARY_PATH="'$libcint_path:$libopenblas_path:$libhdf5_path'/li
 gcc_path='/share/apps/GCC/gcc8'
 echo 'export PATH="'$gcc_path'/bin:$PATH"' >> $HOME/.bash_profile
 echo 'export LD_LIBRARY_PATH="'$gcc_path'/lib:'$gcc_path'/lib64:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
-echo 'alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
+echo '#alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
