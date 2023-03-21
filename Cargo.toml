@@ -1,10 +1,9 @@
 [workspace]
 
 members = [
-    "rest_tensors",
-    "parse_json_basis_set",
     "rest",
-    "rust_libcint"
+    "rest_tensors",
+    "rest_libcint"
 ]
 
 [profile.release]
