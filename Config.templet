@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-user_id=""
 repository="github"
+local_path=""
 
 while getopts u:p: option
 do
@@ -30,7 +30,11 @@ do
     echo "         It is not necessary for the repositories on github"
     echo " "
     echo " Example:"
-    echo " ./Config -r local -p userid_@local_server:/path-to-the-repositories"
+    echo " 0) ./Config"
+    echo "     : use the repositories on github by default"
+    echo " 1) ./Config -r github"
+    echo "     : use the repositories on github by default, and it is not necessary to declare the repository path with '-p' "
+    echo " 2) ./Config -r local -p userid_@local_server:/path-to-the-repositories"
     echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
     echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
     echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
@@ -47,13 +51,11 @@ if [ $repository = "github" ]; then
   export rest_tensors_repo_path="git@github.com:igor-1982/rest_tensors.git"
   export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
   echo $repository
-  exit
 elif [ $repository = "local" ]; then
   export rest_repo_path="${local_path}/rest.mirror"
   export rest_tensors_repo_path="${local_path}/rest_tensors.mirror"
   export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
   echo $repository
-  exit
 else
   echo "Invalid repository is used: $repository"
   exit
