@@ -7,7 +7,6 @@ Installation
    - libcint.so
    - libhdf5.so
    - libxc.so
-   - gcc version 8.0 or higher
 
 * Build REST::
 

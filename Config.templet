@@ -1,22 +1,90 @@
 #!/usr/bin/env bash
-#remote should be "ID@HOST:
-remote=$1
 
-export rest_repo_path="/share/repo/REST/fdqc.mirror"
-[ ! -d rest ] && git clone $remote$rest_repo_path rest
-export rest_tensor_repo_path="/share/repo/REST/fdqc-tensors.mirror"
-[ ! -d rest_tensors ] && git clone $remote$rest_tensor_repo_path rest_tensors
-export rust_libcint_repo_path="/share/repo/REST/rust-libcint.mirror"
-[ ! -d rust_libcint ] && git clone $remote$rust_libcint_repo_path rust_libcint
-export parse_json_basis_set_repo_path="/share/repo/REST/parse_json_basis_set.mirror"
-[ ! -d parse_json_basis_set ] && git clone $remote$parse_json_basis_set_repo_path parse_json_basis_set
+user_id=""
+repository="github"
 
-# Some prerequisite libraries for REST, which should be installed and accessable for REST
+while getopts u:p: option
+do
+  case "${option}"
+    in
+    r) repository=${OPTARG};;
+    p) local_path=${OPTARG};;
+  esac
+done
 
-REST_HOME="$HOME/export/REST"
-# for the native fortran library "restmatr.f90":
-#  1) specify the fortran compiler
+echo "repository=$repository"
+echo "local_path=$local_path"
+
+for i in $@
+do
+	if [ $i = "-h" ]; then 
+    echo "Usage: Configure [OPTION...]"
+		echo "Configure the complitation and simulation environment for the REST package on Linux OS."
+		echo ""
+		echo "OPTION:"
+		echo " -h      print the help information"
+		echo " -r      set the repository. The default one: github"
+		echo "         local:    local repositories"
+		echo "         github:   repositories on github"
+		echo " -p      provide the path to the local repositories"
+    echo "         It is not necessary for the repositories on github"
+    echo " "
+    echo " Example:"
+    echo " ./Configure -r local -p userid_@local_server:/path-to-the-repositories"
+    echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
+    echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
+    echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
+    echo "          userid_@local_server:/path-to-the-repositories/rest_libcints.mirror"
+    echo ""
+    echo " Enjoy the electronic-structure simulation using the REST package"
+    echo ""
+    exit
+	fi
+done
+
+if [ $repository = "github" ]; then
+  export rest_repo_path="/share/repo/REST/fdqc.mirror"
+  export rest_tensors_repo_path="git@github.com:igor-1982/rest_tensors.git"
+  export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
+  echo $repository
+  exit
+elif [ $repository = "local" ]; then
+  export rest_repo_path="${local_path}/rest.mirror"
+  export rest_tensors_repo_path="${local_path}/rest_tensors.mirror"
+  export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
+  echo $repository
+  exit
+else
+  echo "Invalid repository is used: $repository"
+  exit
+fi
+
+
+#==================================================================
+# Some prerequisite libraries for REST, which should be installed 
+# and accessable when compling and excuting the REST package:
+#==================================================================
+#0): REST_FORTRAN_COMPILER: you need a compiler for Fortran language
 REST_FORTRAN_COMPILER="ifort"
+#1): REST_CINT_DIR: the path to libcint.so
+REST_CINT_DIR="/share/apps/rust/libcint/build"
+#2) the path to access the fortrain file
+REST_EXT_DIR="$HOME/export/REST/rest_tensors/src/external_libs"
+#2): REST_BLAS_DIR: the path to libopenblas.so
+REST_BLAS_DIR="/share/apps/rust/OpenBLAS-0.3.17"
+#3): REST_HDF5_DIR: the path to libhdf5.so
+REST_HDF5_DIR="/share/apps/rust/HDF5/lib"
+#4): the path to libxc.so
+REST_XC_DIR="/share/apps/rust/libxc"
+
+#==================================================================
+# Clone the source codes from repositories
+#==================================================================
+[ ! -d rest ] && git clone $remote$rest_repo_path rest
+[ ! -d rest_tensors ] && git clone $remote$rest_tensor_repo_path rest_tensors
+[ ! -d rest_libcint ] && git clone $remote$rust_libcint_repo_path rest_libcint
+
+
 if ! command -v $REST_FORTRAN_COMPILER &> /dev/null
 then
   echo "The fortran compiler $REST_FORTRAN_COMPILER could not be found. Please use an available fortran compiler"
@@ -25,35 +93,25 @@ else
   echo "The fortran compiler $REST_FORTRAN_COMPILER is available"
 fi
 
-echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
-#  2) the path to access the fortrain file
-REST_EXT_DIR="$REST_HOME/rest_tensors/src/external_libs"
+#=======================================================================
+# Append the setting of global enviroment variables to the bash_profile
+#=======================================================================
+if [ ! -f $HOME/.bash_profile ]; then 
+  echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' > $HOME/.bash_profile
+else
+  echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
+fi
 echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
-
-#1): libcint_path: the path to libcint.so
-libcint_path='/share/apps/lib/libcint/build'
-REST_CINT_DIR="/share/apps/rust/libcint/build"
 echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
- 
-#2): libopenblas_path: the path to libopenblas.so
-libopenblas_path='/share/apps/rust/OpenBLAS-0.3.17'
-REST_BLAS_DIR="/share/apps/rust/OpenBLAS-0.3.17"
 echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
- 
-#3): libhdf5_path: the path to libhdf5.so
-libhdf5_path='/share/apps/rust/HDF5'
-REST_HDF5_DIR="/share/apps/rust/HDF5/lib"
 echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
-
-#4): the path to libxc.so
-REST_XC_DIR="/share/apps/rust/libxc"
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
-
-echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
 echo 'export LD_LIBRARY_PATH="'$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 
-# make sure gcc with correct version is loaded properly
-gcc_path='/share/apps/GCC/gcc8'
-echo 'export PATH="'$gcc_path'/bin:$PATH"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$gcc_path'/lib:'$gcc_path'/lib64:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
-echo '#alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
+
+#echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
+## make sure gcc with correct version is loaded properly
+#gcc_path='/share/apps/GCC/gcc8'
+#echo 'export PATH="'$gcc_path'/bin:$PATH"' >> $HOME/.bash_profile
+#echo 'export LD_LIBRARY_PATH="'$gcc_path'/lib:'$gcc_path'/lib64:$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+#echo '#alias cc='$gcc_path'/gcc' >> $HOME/.bash_profile
