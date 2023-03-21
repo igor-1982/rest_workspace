@@ -30,7 +30,7 @@ do
     echo "         It is not necessary for the repositories on github"
     echo " "
     echo " Example:"
-    echo " ./Configure -r local -p userid_@local_server:/path-to-the-repositories"
+    echo " ./Config -r local -p userid_@local_server:/path-to-the-repositories"
     echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
     echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
     echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
