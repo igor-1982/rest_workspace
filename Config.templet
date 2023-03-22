@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
 
+#==================================================================
+# Some prerequisite libraries for REST, which should be installed 
+# and accessable when compling and excuting the REST package:
+#==================================================================
+#0): REST_FORTRAN_COMPILER: you need a compiler for the Fortran code
+REST_FORTRAN_COMPILER="gfortran"
+#1): REST_CINT_DIR: the path to libcint.so
+REST_CINT_DIR="path_to_libcint.so"
+#2) the path to access the fortrain file
+REST_EXT_DIR='path_to_librestmatr.so'
+#2): REST_BLAS_DIR: the path to libopenblas.so
+REST_BLAS_DIR="path_to_libopenblas.so"
+#3): REST_HDF5_DIR: the path to libhdf5.so
+REST_HDF5_DIR="path_to_libhdf5.so"
+#4): the path to libxc.so
+REST_XC_DIR="path_to_libxc.so"
+
+
 repository="github"
 local_path=""
 
-while getopts u:p: option
+while getopts r:p: option
 do
   case "${option}"
     in
@@ -12,8 +30,8 @@ do
   esac
 done
 
-echo "repository=$repository"
-echo "local_path=$local_path"
+#echo "repository=$repository"
+#echo "local_path=$local_path"
 
 for i in $@
 do
@@ -47,44 +65,26 @@ do
 done
 
 if [ $repository = "github" ]; then
-  export rest_repo_path="/share/repo/REST/fdqc.mirror"
+  export rest_repo_path="git@github.com:igor-1982/rest.git"
   export rest_tensors_repo_path="git@github.com:igor-1982/rest_tensors.git"
-  export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
+  export rest_libcint_repo_path="git@github.com:igor-1982/rest_libcint.git"
   echo $repository
 elif [ $repository = "local" ]; then
   export rest_repo_path="${local_path}/rest.mirror"
   export rest_tensors_repo_path="${local_path}/rest_tensors.mirror"
-  export rest_libcint_repo_path="/share/repo/REST/rest_libcint.mirror"
+  export rest_libcint_repo_path="${local_path}/rest_libcint.mirror"
   echo $repository
 else
   echo "Invalid repository is used: $repository"
   exit
 fi
 
-
-#==================================================================
-# Some prerequisite libraries for REST, which should be installed 
-# and accessable when compling and excuting the REST package:
-#==================================================================
-#0): REST_FORTRAN_COMPILER: you need a compiler for Fortran language
-REST_FORTRAN_COMPILER="ifort"
-#1): REST_CINT_DIR: the path to libcint.so
-REST_CINT_DIR="/share/apps/rust/libcint/build"
-#2) the path to access the fortrain file
-REST_EXT_DIR="$HOME/export/REST/rest_tensors/src/external_libs"
-#2): REST_BLAS_DIR: the path to libopenblas.so
-REST_BLAS_DIR="/share/apps/rust/OpenBLAS-0.3.17"
-#3): REST_HDF5_DIR: the path to libhdf5.so
-REST_HDF5_DIR="/share/apps/rust/HDF5/lib"
-#4): the path to libxc.so
-REST_XC_DIR="/share/apps/rust/libxc"
-
 #==================================================================
 # Clone the source codes from repositories
 #==================================================================
-[ ! -d rest ] && git clone $remote$rest_repo_path rest
-[ ! -d rest_tensors ] && git clone $remote$rest_tensor_repo_path rest_tensors
-[ ! -d rest_libcint ] && git clone $remote$rust_libcint_repo_path rest_libcint
+[ ! -d rest ] && git clone $rest_repo_path rest
+[ ! -d rest_tensors ] && git clone $rest_tensors_repo_path rest_tensors
+[ ! -d rest_libcint ] && git clone $rest_libcint_repo_path rest_libcint
 
 
 if ! command -v $REST_FORTRAN_COMPILER &> /dev/null
