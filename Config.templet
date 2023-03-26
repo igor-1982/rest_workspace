@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 #==================================================================
+# set the current folder as the home of the rest workspace
+#==================================================================
+REST_HOME=`pwd`
+#==================================================================
 # Some prerequisite libraries for REST, which should be installed 
 # and accessable when compling and excuting the REST package:
 #==================================================================
@@ -29,9 +33,6 @@ do
     p) local_path=${OPTARG};;
   esac
 done
-
-#echo "repository=$repository"
-#echo "local_path=$local_path"
 
 for i in $@
 do
@@ -86,6 +87,10 @@ fi
 [ ! -d rest_tensors ] && git clone $rest_tensors_repo_path rest_tensors
 [ ! -d rest_libcint ] && git clone $rest_libcint_repo_path rest_libcint
 
+# untar the basis sets in the json format from BSE
+tar -xjf rest/basis_sets-json.tar.bz2
+mv basis_sets-json.tar.bz2 rest/bse_pool
+
 
 if ! command -v $REST_FORTRAN_COMPILER &> /dev/null
 then
@@ -103,12 +108,14 @@ if [ ! -f $HOME/.bash_profile ]; then
 else
   echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
 fi
+echo 'export REST_HOME="'$REST_HOME'"' >> $HOME/.bash_profile
 echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
 echo 'export LD_LIBRARY_PATH="'$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export RUSTDOCFLAGS="--html-in-header $REST_HOME/rest/katex.html"'
 
 
 #echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile
