@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
 #==================================================================
-# set the current folder as the home of the rest workspace
-#==================================================================
-REST_HOME=`pwd`
-#==================================================================
 # Some prerequisite libraries for REST, which should be installed 
 # and accessable when compling and excuting the REST package:
 #==================================================================
@@ -12,8 +8,6 @@ REST_HOME=`pwd`
 REST_FORTRAN_COMPILER="gfortran"
 #1): REST_CINT_DIR: the path to libcint.so
 REST_CINT_DIR="path_to_libcint.so"
-#2) the path to access the fortrain file
-REST_EXT_DIR='path_to_librestmatr.so'
 #2): REST_BLAS_DIR: the path to libopenblas.so
 REST_BLAS_DIR="path_to_libopenblas.so"
 #3): REST_HDF5_DIR: the path to libhdf5.so
@@ -21,10 +15,19 @@ REST_HDF5_DIR="path_to_libhdf5.so"
 #4): the path to libxc.so
 REST_XC_DIR="path_to_libxc.so"
 
+#==================================================================
+# set the current folder (REST_HOME)
+#==================================================================
+REST_HOME=`pwd`
+REST_EXT_DIR=$REST_HOME/lib
+[ ! -d $REST_EXT_DIR ] && mkdir $REST_EXT_DIR
+
 
 repository="github"
 local_path=""
-
+#==================================================================
+# parse the input arguements
+#==================================================================
 while getopts r:p: option
 do
   case "${option}"
@@ -114,8 +117,9 @@ echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
 echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo 'export LD_LIBRARY_PATH="'$REST_XC_DIR:$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
 echo 'export RUSTDOCFLAGS="--html-in-header $REST_HOME/rest/katex.html"'
+echo 'export RUSTFLAGS="-L $REST_XC_DIR -lxc -L $REST_EXT_DIR -lrest2fch -C target-cpu=native"'
 
 
 #echo 'export HDF5_DIR="'$libhdf5_path'"' >> $HOME/.bash_profile

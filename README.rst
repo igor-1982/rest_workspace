@@ -7,6 +7,14 @@ Installation
    - libcint.so
    - libhdf5.so
    - libxc.so
+   - librest2fch.so
+     =========================================================
+     -> git clone https://gitlab.com/jeanwsr/MOKIT -b for-rest
+     -> cd MOKIT/src
+     -> make rest2fch -f Makefile.gnu_openblas
+     -> cp MOKIT/mokit/lib/librest2fch.so $REST_EXT_DIR/
+     =========================================================
+
 
 * Build REST::
 
