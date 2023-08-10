@@ -4,9 +4,35 @@ Installation
 * Prerequisites
 
    - libopenblas.so
+     =========================================================
+     -> git clone https://github.com/xianyi/OpenBLAS.git OpenBLAS
+     -> cd OpenBLAS
+     -> make
+     -> cp libopenblas.so $REST_EXT_DIR/libpoenblas.so
+     =========================================================
    - libcint.so
-   - libhdf5.so
+     =========================================================
+     -> git clone https://github.com/sunqm/libcint.git libcint
+     -> cd libcint
+     -> mkdir build
+     -> cmake -DWITH_RANGE_COULOMB=1 ..
+     -> make
+     -> cp libcint.so $REST_EXT_DIR/libpoenblas.so
+     =========================================================
    - libxc.so
+     =========================================================
+     -> based on your os, download the installation file from 
+            https://www.tddft.org/programs/libxc/download/
+     =========================================================
+   - libhdf5.so
+     =========================================================
+     -> download the source code from 
+          https://www.hdfgroup.org/downloads/hdf5
+     -> tar -zcvf hdf5-*.tar.gz
+     -> cd hdf
+     -> source ./HDF5-*-Linux.sh
+     -> cp HDF5-*/HDF_Group/HDF5/*/lib/libhdf5.so $REST_EXT_DIR/
+     =========================================================
    - librest2fch.so
      =========================================================
      -> git clone https://gitlab.com/jeanwsr/MOKIT -b for-rest
