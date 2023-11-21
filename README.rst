@@ -17,7 +17,7 @@ Installation
      -> mkdir build
      -> cmake -DWITH_RANGE_COULOMB=1 ..
      -> make
-     -> cp libcint.so $REST_EXT_DIR/libpoenblas.so
+     -> cp libcint.so $REST_EXT_DIR/libcint.so
      =========================================================
    - libxc.so
      =========================================================
