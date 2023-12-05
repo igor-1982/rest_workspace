@@ -25,47 +25,54 @@ REST_EXT_DIR=$REST_HOME/lib
 
 repository="github"
 local_path=""
+active="y"
 #==================================================================
 # parse the input arguements
 #==================================================================
-while getopts r:p: option
+while getopts hr:p:e option
 do
   case "${option}"
     in
     r) repository=${OPTARG};;
     p) local_path=${OPTARG};;
+    e) 
+      echo "DONOT add enviroments to bashrc"
+      active="n"
+      ;;
+    h) 
+      echo "Usage: $(basename $0) [OPTION...] [OPTARG]"
+      echo "Configure the complitation and simulation environment for the REST package on Linux OS."
+      echo ""
+      echo "OPTION:"
+      echo " -h         print the help information"
+      echo " -r OPTARG  set the repository. The default OPTARG: github"
+      echo "              local:    local repositories"
+      echo "              github:   repositories on github"
+      echo " -p OPTARG  provide the path to the local repositories"
+      echo "            It is not necessary for the repositories on github"
+      echo " -e         DONOT add enviroments to bashrc"
+      echo "            This script will NOT modify your bashrc file. Use it only if you understand its implications"    
+      echo " "
+      echo " Example:"
+      echo " 0) ./Config"
+      echo "     : use the repositories on github by default"
+      echo " 1) ./Config -r github"
+      echo "     : use the repositories on github by default, and it is not necessary to declare the repository path with '-p' "
+      echo " 2) ./Config -r local -p userid_@local_server:/path-to-the-repositories"
+      echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
+      echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
+      echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
+      echo "          userid_@local_server:/path-to-the-repositories/rest_libcints.mirror"
+      echo ""
+      echo " Enjoy the electronic-structure simulation using the REST package"
+      echo ""
+      exit
+      ;;
+    ?)
+      echo "script usage: $(basename $0) [-h] [-e] [-r] [OPTARG] [-p] [OPTARG]" >&2
+      exit 1
+      ;;
   esac
-done
-
-for i in $@
-do
-	if [ $i = "-h" ]; then 
-    echo "Usage: Configure [OPTION...]"
-		echo "Configure the complitation and simulation environment for the REST package on Linux OS."
-		echo ""
-		echo "OPTION:"
-		echo " -h      print the help information"
-		echo " -r      set the repository. The default one: github"
-		echo "         local:    local repositories"
-		echo "         github:   repositories on github"
-		echo " -p      provide the path to the local repositories"
-    echo "         It is not necessary for the repositories on github"
-    echo " "
-    echo " Example:"
-    echo " 0) ./Config"
-    echo "     : use the repositories on github by default"
-    echo " 1) ./Config -r github"
-    echo "     : use the repositories on github by default, and it is not necessary to declare the repository path with '-p' "
-    echo " 2) ./Config -r local -p userid_@local_server:/path-to-the-repositories"
-    echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
-    echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
-    echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
-    echo "          userid_@local_server:/path-to-the-repositories/rest_libcints.mirror"
-    echo ""
-    echo " Enjoy the electronic-structure simulation using the REST package"
-    echo ""
-    exit
-	fi
 done
 
 if [ $repository = "github" ]; then
@@ -91,8 +98,10 @@ fi
 [ ! -d rest_libcint ] && git clone $rest_libcint_repo_path rest_libcint
 
 # untar the basis sets in the json format from BSE
-tar -xjf rest/basis_sets-json.tar.bz2
-mv basis_sets-json.tar.bz2 rest/bse_pool
+if [ -f rest/basis_sets-json.tar.bz2 ]; then
+  tar -xjf rest/basis_sets-json.tar.bz2
+  mv basis_sets-json.tar.bz2 rest/bse_pool
+fi
 
 
 if ! command -v $REST_FORTRAN_COMPILER &> /dev/null
@@ -106,18 +115,34 @@ fi
 #=======================================================================
 # Append the setting of global enviroment variables to the bash_profile
 #=======================================================================
-if [ ! -f $HOME/.bash_profile ]; then 
-  echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' > $HOME/.bash_profile
+if [ $active = "y" ]; then
+  if [ ! -f $HOME/.bash_profile ]; then 
+    echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' > $HOME/.bash_profile
+  else
+    echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
+  fi
+  echo 'export REST_HOME="'$REST_HOME'"' >> $HOME/.bash_profile
+  echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
+  echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
+  echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
+  echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
+  echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
+  echo 'export LD_LIBRARY_PATH="'$REST_XC_DIR:$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+  echo "! After running 'source \$HOME/.bash_profile', please execute the following commands in your terminal..."
 else
-  echo 'export REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"' >> $HOME/.bash_profile
+  echo "! Note: Please activate the following environments manually..."
+  echo "-----------------------------------"
+  echo 'REST_FORTRAN_COMPILER="'$REST_FORTRAN_COMPILER'"'
+  echo 'REST_HOME="'$REST_HOME'"' 
+  echo 'REST_EXT_DIR="'$REST_EXT_DIR'"' 
+  echo 'REST_CINT_DIR="'$REST_CINT_DIR'"' 
+  echo 'REST_BLAS_DIR="'$REST_BLAS_DIR'"' 
+  echo 'REST_HDF5_DIR="'$REST_HDF5_DIR'"' 
+  echo 'REST_XC_DIR="'$REST_XC_DIR'"'
+  echo 'LD_LIBRARY_PATH="'$REST_XC_DIR:$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' 
+  echo "! Note: After activating enviroments, please run the following commands in your terminal..."
 fi
-echo 'export REST_HOME="'$REST_HOME'"' >> $HOME/.bash_profile
-echo 'export REST_EXT_DIR="'$REST_EXT_DIR'"' >> $HOME/.bash_profile
-echo 'export REST_CINT_DIR="'$REST_CINT_DIR'"' >> $HOME/.bash_profile
-echo 'export REST_BLAS_DIR="'$REST_BLAS_DIR'"' >> $HOME/.bash_profile
-echo 'export REST_HDF5_DIR="'$REST_HDF5_DIR'"' >> $HOME/.bash_profile
-echo 'export REST_XC_DIR="'$REST_XC_DIR'"' >> $HOME/.bash_profile
-echo 'export LD_LIBRARY_PATH="'$REST_XC_DIR:$REST_EXT_DIR:$REST_CINT_DIR:$REST_BLAS_DIR:$REST_HDF5_DIR:'$LD_LIBRARY_PATH"' >> $HOME/.bash_profile
+echo "-----------------------------------"
 echo 'export RUSTDOCFLAGS="--html-in-header $REST_HOME/rest/katex.html"'
 echo 'export RUSTFLAGS="-L $REST_XC_DIR -lxc -L $REST_EXT_DIR -lrest2fch -C target-cpu=native"'
 
