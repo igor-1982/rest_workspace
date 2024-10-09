@@ -149,8 +149,8 @@ fi
 
 echo "================================  IMPORTANT ISSUE   =================================================="
 echo "! External libraries for REST:"
-echo "!  - These libraries are required and should be placed in the `$REST_EXT_DIR` directory."
-echo "!  - For detailed information about the required libraries, please refer to the `README.rts` file."
+echo "!  - These libraries are required and should be placed in the folder of $REST_EXT_DIR."
+echo "!  - For detailed information about the required libraries, please refer to 'README.rts'."
 echo "======================================================================================================"
 
 
