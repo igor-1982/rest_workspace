@@ -101,25 +101,27 @@ Installation
      =========================================================
    - libxc.so
      =========================================================
-     -> based on your os, download the installation file from 
-            https://www.tddft.org/programs/libxc/download/
-     -> tar xf libxc-*
-     -> cd libxc-*
-     -> ./configure --prefix=$(pwd) --enable-shared
+     #-> based on your os, download the installation file from 
+     #       https://www.tddft.org/programs/libxc/download/
+     -> wget https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.bz2
+     -> tar xf libxc-6.2.2.tar.bz2
+     -> cd libxc-6.2.2
+     -> autoreconf -i     # generate `configure` at first
+     -> ./configure --prefix=<Path to install libxc> --enable-shared
           `--enable-shared` is needed to produce the share library "libxc.so", otherwise only libxc.a is generated.
      -> make -jN
         The variable "N" represents a integer value that indicates the number of CPUs you wish to use for the compilation process.
      -> make install
-     -> cp lib/libxc.so* $REST_EXT_DIR
-     -> cp lib/libxc.a  $REST_EXT_DIR
+     -> cp <Path to installed libxc>lib/libxc.so* $REST_EXT_DIR
+     -> cp <Path to installed libxc>lib/libxc.a  $REST_EXT_DIR
      =========================================================
    - libhdf5.so
      =========================================================
-     -> download the source code from https://www.hdfgroup.org/downloads/hdf5
+     -> download the source code https://www.hdfgroup.org/downloads/hdf5
           DO NOT DOWNLOAD the .zip file, if you are using a Linux system.
           Please consider downloading version 1.8.x since REST calls the older version of HDF5 functions. 
           The APIs of v1.14 only contain H5L_iterate, and REST calls the function H5Literate, resulting in an error "undefined reference to 'H5Literate'". 
-          Although the latest HDF5 offers the 1.8 APIs, specify --with-default-api-version=v18 when building. However, please note that this flag may not be effective in practice.
+          The latest HDF5 offers the 1.8 APIs, specify --with-default-api-version=v18 when building, however, please note that this flag may not be effective in practice.
           You can run `nm -D lib/libhdf5.so | grep H5Literate` after making hdf5 compilation to check the function existance.
      -> tar -zcvf hdf5-*.tar.gz
      -> cd hdf5-*
@@ -137,7 +139,7 @@ Installation
      -> git clone https://gitlab.com/jeanwsr/MOKIT -b for-rest
      -> cd MOKIT/src
      -> make rest2fch -f Makefile.gnu_openblas
-     -> cp MOKIT/mokit/lib/librest2fch.so $REST_EXT_DIR/
+     -> cp ../mokit/lib/librest2fch.so $REST_EXT_DIR/
      =========================================================
    - libs-dftd3.so
      =========================================================
@@ -151,7 +153,7 @@ Installation
      -> cmake -B build -G Ninja -DBUILD_SHARED_LIBS=1
      -> cmake --build build
      -> cp build/libs-dftd3.so.* $REST_EXT_DIR/
-     -> mkdir -f $REST_EXT_INC/dftd3
+     -> mkdir -p $REST_EXT_INC/dftd3
      -> find build -name *.mod | xargs -I {} cp {} $REST_EXT_INC/dftd3
          This step is rather important to finish building the system. 
          Wherever your $REST_EXT_INC is, you should always put your mods in the dftd3 directory.
@@ -166,7 +168,7 @@ Installation
        -> cd dftd4
        -> cmake -B build -G Ninja -DBUILD_SHARED_LIBS=1
        -> cmake --build build
-       -> mkdir -f $REST_EXT_INC/dftd4
+       -> mkdir -p $REST_EXT_INC/dftd4
        -> cp build/libdftd4.so.* $REST_EXT_DIR/
        -> find build -name *.mod | xargs -I {} cp {} $REST_EXT_INC/dftd4
      ===========================================================
