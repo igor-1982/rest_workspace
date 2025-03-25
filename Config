@@ -19,7 +19,7 @@ REST_BLAS_DIR=$REST_EXT_DIR
 #==================================================================
 # parse the input arguements and initialize some parameters
 #==================================================================
-repository="github"
+repository="gitee"
 local_path=""
 active="y"
 REST_FORTRAN_COMPILER="gfortran"
@@ -51,10 +51,13 @@ do
       echo " "
       echo " Example:"
       echo " 0) ./Config"
-      echo "     : use the repositories on github by default"
+      echo "     : use the repositories on gitee by default"
+      echo " 2) ./Config -r gitee -f fortran"
+      echo "     : use the repositories on gitee by default, and it is not necessary to declare the repository path with '-p' "
       echo " 1) ./Config -r github -f fortran"
-      echo "     : use the repositories on github by default, and it is not necessary to declare the repository path with '-p' "
-      echo " 2) ./Config -r local -p userid_@local_server:/path-to-the-repositories"
+      echo "     : use the repositories on github and it is not necessary to declare the repository path with '-p'. "
+	  echo "       WARNING: due to the network connetction issue, the github repository will not be updated timely."
+      echo " 3) ./Config -r local -p userid_@local_server:/path-to-the-repositories"
       echo "     : The configure script will then clone the rest, rest_tensors, rest_libcints via:"
       echo "          userid_@local_server:/path-to-the-repositories/rest.mirror"
       echo "          userid_@local_server:/path-to-the-repositories/rest_tensors.mirror"
@@ -78,7 +81,13 @@ do
   esac
 done
 
-if [ $repository = "github" ]; then
+if [ $repository = "gitee" ]; then
+  export rest_repo_path="https://gitee.com/restgroup/rest.git"
+  export rest_tensors_repo_path="https://gitee.com/restgroup/rest_tensors.git"
+  export rest_libcint_repo_path="https://gitee.com/restgroup/rest_libcint.git"
+  export rest_regress_repo_path="https://gitee.com/restgroup/rest_regression.git"
+  echo $repository
+elif [ $repository = "github" ]; then
   export rest_repo_path="git@github.com:igor-1982/rest.git"
   export rest_tensors_repo_path="git@github.com:igor-1982/rest_tensors.git"
   export rest_libcint_repo_path="git@github.com:igor-1982/rest_libcint.git"
