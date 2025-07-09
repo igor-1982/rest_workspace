@@ -1,0 +1,18 @@
+[package]
+name = "similarity_check"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rustamath_mnmz = "0.1.1"
+rest_tensors = {path="../../rest_tensors"}
+liblbfgs = "0.1.0"
+libm = "0.2.8"
+regex = "1.10.5"
+anyhow = "1.0.86"
+clap = "4.5.11"
+chrono = "0.4.38"
+lazy_static = "1.5"
+rayon = "1.10.0"
+gchemol = "0.1.7"
+spdkit = "0.1.0"
