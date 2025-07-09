@@ -6,7 +6,7 @@ members = [
     "rest_libcint",
     "rest",
     "rest_regression", 
-    #"utilities/similarity_check", 
+    "utilities/similarity_check", 
     #"utilities/trajectory_analysis"
 ]
 
